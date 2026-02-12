@@ -2,7 +2,7 @@ import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { Home, Receipt, ShoppingBag, Calendar, MoreHorizontal } from "lucide-react";
 
 const tabs = [
-  { path: "/", icon: Home, label: "Inicio" },
+  { path: "/home", icon: Home, label: "Inicio" },
   { path: "/tickets", icon: Receipt, label: "Tickets" },
   { path: "/reservas", icon: ShoppingBag, label: "Reservas" },
   { path: "/eventos", icon: Calendar, label: "Eventos" },
@@ -24,7 +24,7 @@ const AppLayout = () => {
         <div className="flex items-center justify-around h-16 max-w-lg mx-auto px-2">
           {tabs.map(({ path, icon: Icon, label }) => {
             const isActive = location.pathname === path || 
-              (path !== "/" && location.pathname.startsWith(path));
+              (path !== "/home" && location.pathname.startsWith(path));
             return (
               <button
                 key={path}
