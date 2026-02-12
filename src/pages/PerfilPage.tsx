@@ -1,22 +1,35 @@
-import { Star, Trophy, Gift, ChevronRight, LogOut } from "lucide-react";
-
-const mockCoupons = [
-  { id: 1, code: "FRIKI-5OFF", desc: "5€ descuento en compra +30€", expires: "28 Feb 2026", status: "available" },
-  { id: 2, code: "DOBLE-PTS", desc: "Doble puntos en tu próxima compra", expires: "15 Mar 2026", status: "available" },
-];
-
-const levels = [
-  { name: "Novato", min: 0, icon: "🎮" },
-  { name: "Friki", min: 500, icon: "🎯" },
-  { name: "Pro Gamer", min: 1000, icon: "⚔️" },
-  { name: "Legendario", min: 2000, icon: "👑" },
-  { name: "Mítico", min: 5000, icon: "🌟" },
-];
+import { Star, Trophy, Gift, ChevronRight, LogOut, Loader2, Award } from "lucide-react";
+import { useProfile, useLevels, useAchievements } from "@/hooks/useProfile";
+import { useMyRedemptions } from "@/hooks/useRewards";
+import { useAuth } from "@/contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 const PerfilPage = () => {
-  const currentPoints = 1250;
-  const currentLevel = levels.filter((l) => currentPoints >= l.min).pop()!;
-  const nextLevel = levels.find((l) => l.min > currentPoints);
+  const navigate = useNavigate();
+  const { user, signOut } = useAuth();
+  const { data: profile, isLoading: loadingProfile } = useProfile();
+  const { data: levels, isLoading: loadingLevels } = useLevels();
+  const { data: redemptions } = useMyRedemptions();
+  const { allAchievements, userAchievements } = useAchievements();
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate("/");
+  };
+
+  if (loadingProfile || loadingLevels) {
+    return (
+      <div className="flex justify-center items-center py-20">
+        <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
+  const currentPoints = profile?.points ?? 0;
+  const currentLevelData = levels?.filter((l) => currentPoints >= l.min_points).pop();
+  const nextLevel = levels?.find((l) => l.min_points > currentPoints);
+  const activeCoupons = redemptions?.filter((r) => r.status === "disponible") ?? [];
+  const unlockedIds = new Set(userAchievements.data?.map((ua) => ua.achievement_id) ?? []);
 
   return (
     <div className="px-4 pt-6 pb-4 max-w-lg mx-auto space-y-6 animate-fade-in">
@@ -25,21 +38,29 @@ const PerfilPage = () => {
       {/* User Card */}
       <div className="bg-card rounded-2xl p-5 border-glow glow-primary text-center space-y-3">
         <div className="w-16 h-16 mx-auto rounded-full gradient-neon flex items-center justify-center text-2xl">
-          {currentLevel.icon}
+          {currentLevelData?.icon || "🎮"}
         </div>
         <div>
-          <p className="font-semibold text-lg">Jugador Friki</p>
-          <p className="text-sm text-muted-foreground">friki@email.com</p>
+          <p className="font-semibold text-lg">{profile?.display_name || "Jugador"}</p>
+          <p className="text-sm text-muted-foreground">{user?.email}</p>
         </div>
         <div className="flex items-center justify-center gap-2">
           <Trophy className="w-4 h-4 text-neon-orange" />
-          <span className="text-sm font-semibold text-neon-orange text-display">{currentLevel.name}</span>
+          <span className="text-sm font-semibold text-neon-orange text-display">{currentLevelData?.name || profile?.level}</span>
         </div>
         <p className="text-3xl font-bold text-primary text-display">{currentPoints.toLocaleString()} pts</p>
         {nextLevel && (
-          <p className="text-xs text-muted-foreground">
-            Faltan {nextLevel.min - currentPoints} pts para {nextLevel.icon} {nextLevel.name}
-          </p>
+          <div className="space-y-1">
+            <p className="text-xs text-muted-foreground">
+              Faltan {(nextLevel.min_points - currentPoints).toLocaleString()} pts para {nextLevel.icon} {nextLevel.name}
+            </p>
+            <div className="h-2 bg-muted rounded-full overflow-hidden">
+              <div
+                className="h-full gradient-neon rounded-full transition-all duration-500"
+                style={{ width: `${((currentPoints - (currentLevelData?.min_points ?? 0)) / (nextLevel.min_points - (currentLevelData?.min_points ?? 0))) * 100}%` }}
+              />
+            </div>
+          </div>
         )}
       </div>
 
@@ -47,14 +68,21 @@ const PerfilPage = () => {
       <section>
         <h2 className="text-sm font-semibold text-display tracking-wider uppercase mb-3">Niveles</h2>
         <div className="space-y-2">
-          {levels.map((level) => {
-            const reached = currentPoints >= level.min;
+          {levels?.map((level) => {
+            const reached = currentPoints >= level.min_points;
             return (
-              <div key={level.name} className={`flex items-center gap-3 p-3 rounded-xl ${reached ? "bg-card border border-primary/20" : "bg-muted/50 opacity-50"}`}>
+              <div key={level.id} className={`flex items-center gap-3 p-3 rounded-xl ${reached ? "bg-card border border-primary/20" : "bg-muted/50 opacity-50"}`}>
                 <span className="text-xl">{level.icon}</span>
                 <div className="flex-1">
                   <p className="text-sm font-medium">{level.name}</p>
-                  <p className="text-xs text-muted-foreground">{level.min.toLocaleString()} pts</p>
+                  <p className="text-xs text-muted-foreground">{level.min_points.toLocaleString()} pts</p>
+                  {reached && level.benefits && level.benefits.length > 0 && (
+                    <div className="mt-1 flex flex-wrap gap-1">
+                      {level.benefits.map((b, i) => (
+                        <span key={i} className="text-[10px] px-1.5 py-0.5 rounded-full bg-primary/10 text-primary">{b}</span>
+                      ))}
+                    </div>
+                  )}
                 </div>
                 {reached && <Star className="w-4 h-4 text-primary" />}
               </div>
@@ -63,24 +91,51 @@ const PerfilPage = () => {
         </div>
       </section>
 
-      {/* Coupons */}
-      <section>
-        <h2 className="text-sm font-semibold text-display tracking-wider uppercase mb-3">Mis Cupones</h2>
-        <div className="space-y-2">
-          {mockCoupons.map((c) => (
-            <div key={c.id} className="bg-card rounded-xl p-4 border border-neon-orange/20">
-              <div className="flex items-center justify-between mb-1">
-                <code className="text-sm font-bold text-neon-orange text-display">{c.code}</code>
-                <Gift className="w-4 h-4 text-neon-orange" />
-              </div>
-              <p className="text-xs text-muted-foreground">{c.desc}</p>
-              <p className="text-[10px] text-muted-foreground mt-1">Válido hasta: {c.expires}</p>
-            </div>
-          ))}
-        </div>
-      </section>
+      {/* Achievements */}
+      {allAchievements.data && allAchievements.data.length > 0 && (
+        <section>
+          <h2 className="text-sm font-semibold text-display tracking-wider uppercase mb-3">Logros</h2>
+          <div className="grid grid-cols-3 gap-2">
+            {allAchievements.data.map((a) => {
+              const unlocked = unlockedIds.has(a.id);
+              return (
+                <div key={a.id} className={`text-center p-3 rounded-xl ${unlocked ? "bg-card border border-primary/20" : "bg-muted/50 opacity-40"}`}>
+                  <span className="text-2xl">{a.icon}</span>
+                  <p className="text-[10px] font-medium mt-1 line-clamp-1">{a.name}</p>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      )}
 
-      <button className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-destructive/10 text-destructive text-sm font-medium">
+      {/* Active Coupons */}
+      {activeCoupons.length > 0 && (
+        <section>
+          <h2 className="text-sm font-semibold text-display tracking-wider uppercase mb-3">Cupones Activos</h2>
+          <div className="space-y-2">
+            {activeCoupons.map((c) => (
+              <div key={c.id} className="bg-card rounded-xl p-4 border border-neon-orange/20">
+                <div className="flex items-center justify-between mb-1">
+                  <code className="text-sm font-bold text-neon-orange text-display">{c.coupon_code}</code>
+                  <Gift className="w-4 h-4 text-neon-orange" />
+                </div>
+                <p className="text-xs text-muted-foreground">{(c as any).rewards?.name || "Recompensa"}</p>
+                {c.expires_at && (
+                  <p className="text-[10px] text-muted-foreground mt-1">
+                    Válido hasta: {new Date(c.expires_at).toLocaleDateString("es-ES")}
+                  </p>
+                )}
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      <button
+        onClick={handleSignOut}
+        className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-destructive/10 text-destructive text-sm font-medium"
+      >
         <LogOut className="w-4 h-4" />
         Cerrar sesión
       </button>

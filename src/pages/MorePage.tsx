@@ -1,14 +1,18 @@
 import { useNavigate } from "react-router-dom";
-import { Bell, Gift, User, Star, Trophy, ChevronRight, Settings, LogOut } from "lucide-react";
-
-const menuItems = [
-  { icon: Gift, label: "Sorteos", desc: "Participa y gana premios", path: "/sorteos", color: "text-neon-pink" },
-  { icon: Bell, label: "Alertas TCG", desc: "Reposiciones y lanzamientos", path: "/tcg", color: "text-neon-green" },
-  { icon: User, label: "Mi Perfil", desc: "Datos, niveles y cupones", path: "/perfil", color: "text-foreground" },
-];
+import { Bell, Gift, User, Star, Trophy, ChevronRight, Award, MapPin } from "lucide-react";
+import { useProfile } from "@/hooks/useProfile";
 
 const MorePage = () => {
   const navigate = useNavigate();
+  const { data: profile } = useProfile();
+
+  const menuItems = [
+    { icon: Award, label: "Recompensas", desc: "Canjea puntos por premios", path: "/recompensas", color: "text-primary" },
+    { icon: Gift, label: "Sorteos", desc: "Participa y gana premios", path: "/sorteos", color: "text-neon-pink" },
+    { icon: Bell, label: "Alertas TCG", desc: "Reposiciones y lanzamientos", path: "/tcg", color: "text-neon-green" },
+    { icon: User, label: "Mi Perfil", desc: "Datos, niveles y logros", path: "/perfil", color: "text-foreground" },
+    { icon: MapPin, label: "Contacto", desc: "Dirección, horario y WhatsApp", path: "/contacto", color: "text-neon-orange" },
+  ];
 
   return (
     <div className="px-4 pt-6 pb-4 max-w-lg mx-auto space-y-5 animate-fade-in">
@@ -20,8 +24,8 @@ const MorePage = () => {
           <Trophy className="w-6 h-6 text-primary-foreground" />
         </div>
         <div className="flex-1">
-          <p className="text-sm font-semibold">Pro Gamer</p>
-          <p className="text-xs text-muted-foreground">1.250 puntos · 2 cupones</p>
+          <p className="text-sm font-semibold">{profile?.level || "Novato"}</p>
+          <p className="text-xs text-muted-foreground">{(profile?.points ?? 0).toLocaleString()} puntos</p>
         </div>
         <Star className="w-5 h-5 text-neon-orange" />
       </div>

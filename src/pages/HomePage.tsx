@@ -1,5 +1,7 @@
-import { Receipt, ShoppingBag, Calendar, Gift, Bell, Star, Trophy, TrendingUp, CheckCircle } from "lucide-react";
+import { Receipt, ShoppingBag, Calendar, Gift, Bell, Star, Trophy, TrendingUp, CheckCircle, Award } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useProfile } from "@/hooks/useProfile";
+import { useStore } from "@/contexts/StoreContext";
 
 const quickActions = [
   { icon: Receipt, label: "Enviar Ticket", path: "/tickets", color: "text-primary" },
@@ -7,15 +9,6 @@ const quickActions = [
   { icon: Calendar, label: "Eventos", path: "/eventos", color: "text-neon-purple" },
   { icon: Bell, label: "TCG Alerts", path: "/tcg", color: "text-neon-green", badge: 3 },
 ];
-
-const mockStats = {
-  points: 1250,
-  level: "Pro Gamer",
-  nextLevel: 2000,
-  coupons: 2,
-  activeReservations: 1,
-  upcomingEvents: 3,
-};
 
 const mockEvents = [
   { id: 1, title: "Torneo Pokémon TCG", date: "15 Feb", spots: 4, category: "TCG" },
@@ -29,8 +22,13 @@ const mockGiveaways = [
 
 const HomePage = () => {
   const navigate = useNavigate();
+  const { data: profile } = useProfile();
+  const { config } = useStore();
 
-  const progressPercent = (mockStats.points / mockStats.nextLevel) * 100;
+  const currentPoints = profile?.points ?? 0;
+  const currentLevel = profile?.level ?? "Novato";
+  const nextLevelPoints = currentPoints < 500 ? 500 : currentPoints < 1000 ? 1000 : currentPoints < 2000 ? 2000 : currentPoints < 5000 ? 5000 : null;
+  const progressPercent = nextLevelPoints ? (currentPoints / nextLevelPoints) * 100 : 100;
 
   return (
     <div className="px-4 pt-6 pb-4 max-w-lg mx-auto space-y-6 animate-fade-in">
@@ -38,7 +36,7 @@ const HomePage = () => {
       <div className="flex items-center justify-between">
         <div>
           <p className="text-sm text-muted-foreground">Bienvenido de nuevo</p>
-          <h1 className="text-2xl font-bold text-gradient-neon">FrikiQuest</h1>
+          <h1 className="text-2xl font-bold text-gradient-neon text-display">{config.store_name}</h1>
         </div>
         <button
           onClick={() => navigate("/perfil")}
@@ -53,19 +51,19 @@ const HomePage = () => {
         <div className="flex items-center justify-between mb-3">
           <div>
             <p className="text-xs text-muted-foreground text-display tracking-widest uppercase">Tus Puntos</p>
-            <p className="text-3xl font-bold text-primary text-display">{mockStats.points.toLocaleString()}</p>
+            <p className="text-3xl font-bold text-primary text-display">{currentPoints.toLocaleString()}</p>
           </div>
           <div className="text-right">
             <div className="flex items-center gap-1.5">
               <Trophy className="w-4 h-4 text-neon-orange" />
-              <span className="text-sm font-semibold text-neon-orange text-display">{mockStats.level}</span>
+              <span className="text-sm font-semibold text-neon-orange text-display">{currentLevel}</span>
             </div>
           </div>
         </div>
         <div className="space-y-1.5">
           <div className="flex justify-between text-xs text-muted-foreground">
             <span>Progreso al siguiente nivel</span>
-            <span>{mockStats.points}/{mockStats.nextLevel}</span>
+            {nextLevelPoints && <span>{currentPoints}/{nextLevelPoints}</span>}
           </div>
           <div className="h-2.5 bg-muted rounded-full overflow-hidden">
             <div
@@ -98,12 +96,27 @@ const HomePage = () => {
         ))}
       </div>
 
+      {/* Rewards CTA */}
+      <button
+        onClick={() => navigate("/recompensas")}
+        className="w-full flex items-center gap-3 bg-card rounded-2xl p-4 border border-primary/20 hover:bg-surface-hover transition-colors"
+      >
+        <div className="w-11 h-11 rounded-xl gradient-neon flex items-center justify-center shrink-0">
+          <Award className="w-5 h-5 text-primary-foreground" />
+        </div>
+        <div className="flex-1 text-left">
+          <p className="text-sm font-semibold">Canjea tus puntos</p>
+          <p className="text-xs text-muted-foreground">Descubre las recompensas disponibles</p>
+        </div>
+        <span className="text-xs text-primary font-medium">Ver →</span>
+      </button>
+
       {/* Stats Row */}
       <div className="grid grid-cols-3 gap-3">
         {[
-          { label: "Cupones", value: mockStats.coupons, icon: Gift, color: "text-neon-orange" },
-          { label: "Reservas", value: mockStats.activeReservations, icon: ShoppingBag, color: "text-primary" },
-          { label: "Eventos", value: mockStats.upcomingEvents, icon: Calendar, color: "text-neon-purple" },
+          { label: "Cupones", value: 0, icon: Gift, color: "text-neon-orange" },
+          { label: "Reservas", value: 0, icon: ShoppingBag, color: "text-primary" },
+          { label: "Eventos", value: mockEvents.length, icon: Calendar, color: "text-neon-purple" },
         ].map(({ label, value, icon: Icon, color }) => (
           <div key={label} className="bg-card rounded-2xl p-4 border border-border text-center">
             <Icon className={`w-5 h-5 mx-auto mb-1.5 ${color}`} />
@@ -145,10 +158,7 @@ const HomePage = () => {
         <section>
           <h2 className="text-sm font-semibold text-display tracking-wider uppercase mb-3">Sorteo Activo 🎉</h2>
           {mockGiveaways.map((g) => (
-            <div
-              key={g.id}
-              className="flex items-center gap-3 bg-card rounded-2xl p-4 border border-border"
-            >
+            <div key={g.id} className="flex items-center gap-3 bg-card rounded-2xl p-4 border border-border">
               <div className="w-11 h-11 rounded-xl bg-muted flex items-center justify-center shrink-0">
                 <Gift className="w-5 h-5 text-neon-pink" />
               </div>

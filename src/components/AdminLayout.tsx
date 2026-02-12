@@ -1,7 +1,7 @@
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard, Receipt, ShoppingBag, Calendar, Gift,
-  MessageCircle, ChevronLeft, Menu, X,
+  MessageCircle, ChevronLeft, Menu, X, Award, Store,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -11,7 +11,9 @@ const adminTabs = [
   { path: "/admin/reservas", icon: ShoppingBag, label: "Reservas" },
   { path: "/admin/eventos", icon: Calendar, label: "Eventos" },
   { path: "/admin/sorteos", icon: Gift, label: "Sorteos" },
+  { path: "/admin/recompensas", icon: Award, label: "Recompensas" },
   { path: "/admin/chatbot", icon: MessageCircle, label: "Chatbot KB" },
+  { path: "/admin/config-tienda", icon: Store, label: "Config Tienda" },
 ];
 
 const AdminLayout = () => {
