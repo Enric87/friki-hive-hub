@@ -159,6 +159,7 @@ export type Database = {
           points_cost: number
           reward_type: string
           stock: number | null
+          tags: string[] | null
           updated_at: string
         }
         Insert: {
@@ -171,6 +172,7 @@ export type Database = {
           points_cost: number
           reward_type?: string
           stock?: number | null
+          tags?: string[] | null
           updated_at?: string
         }
         Update: {
@@ -183,6 +185,7 @@ export type Database = {
           points_cost?: number
           reward_type?: string
           stock?: number | null
+          tags?: string[] | null
           updated_at?: string
         }
         Relationships: []
