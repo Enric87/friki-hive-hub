@@ -1,7 +1,8 @@
 import { useNavigate } from "react-router-dom";
-import { Bell, User, Star, Trophy, ChevronRight, Settings, LogOut } from "lucide-react";
+import { Bell, Gift, User, Star, Trophy, ChevronRight, Settings, LogOut } from "lucide-react";
 
 const menuItems = [
+  { icon: Gift, label: "Sorteos", desc: "Participa y gana premios", path: "/sorteos", color: "text-neon-pink" },
   { icon: Bell, label: "Alertas TCG", desc: "Reposiciones y lanzamientos", path: "/tcg", color: "text-neon-green" },
   { icon: User, label: "Mi Perfil", desc: "Datos, niveles y cupones", path: "/perfil", color: "text-foreground" },
 ];

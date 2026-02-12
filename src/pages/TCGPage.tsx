@@ -2,11 +2,11 @@ import { useState } from "react";
 import { Bell, Check, ChevronRight, Settings } from "lucide-react";
 
 const tcgGames = [
-  { id: "pokemon", name: "Pokémon", emoji: "⚡" },
-  { id: "onepiece", name: "One Piece", emoji: "🏴‍☠️" },
-  { id: "magic", name: "Magic: The Gathering", emoji: "🧙" },
-  { id: "yugioh", name: "Yu-Gi-Oh!", emoji: "👁️" },
-  { id: "lorcana", name: "Lorcana", emoji: "✨" },
+  { id: "pokemon", name: "Pokémon", emoji: "⚡", image: "https://images.unsplash.com/photo-1613771404784-3a5686aa2be3?w=400&q=80" },
+  { id: "onepiece", name: "One Piece", emoji: "🏴‍☠️", image: "https://images.unsplash.com/photo-1608889825205-eebdb9fc5806?w=400&q=80" },
+  { id: "magic", name: "Magic: The Gathering", emoji: "🧙", image: "https://images.unsplash.com/photo-1642056446633-cfab1f608cfc?w=400&q=80" },
+  { id: "yugioh", name: "Yu-Gi-Oh!", emoji: "👁️", image: "https://images.unsplash.com/photo-1606503153255-59d8b8b82176?w=400&q=80" },
+  { id: "lorcana", name: "Lorcana", emoji: "✨", image: "https://images.unsplash.com/photo-1569003339405-ea396a5a8a90?w=400&q=80" },
 ];
 
 const alertTypes = [
@@ -63,9 +63,12 @@ const TCGPage = () => {
                       selected ? "bg-primary/10 border border-primary/30" : "bg-card border border-border/50"
                     }`}
                   >
-                    <span className="text-sm">
-                      {game.emoji} {game.name}
-                    </span>
+                    <div className="flex items-center gap-3">
+                      <img src={game.image} alt={game.name} className="w-10 h-10 rounded-lg object-cover" />
+                      <span className="text-sm">
+                        {game.emoji} {game.name}
+                      </span>
+                    </div>
                     {selected && <Check className="w-4 h-4 text-primary" />}
                   </button>
                 );
@@ -106,15 +109,19 @@ const TCGPage = () => {
           </button>
         </div>
       ) : (
-        <div className="space-y-3">
-          {/* Active preferences */}
-          <div className="flex gap-2 flex-wrap">
+        <div className="space-y-4">
+          {/* Game cards with images */}
+          <div className="grid grid-cols-2 gap-3">
             {selectedGames.map((gid) => {
               const game = tcgGames.find((g) => g.id === gid);
               return game ? (
-                <span key={gid} className="text-xs bg-muted px-2.5 py-1 rounded-full">
-                  {game.emoji} {game.name}
-                </span>
+                <div key={gid} className="relative rounded-xl overflow-hidden border border-border/50">
+                  <img src={game.image} alt={game.name} className="w-full h-24 object-cover" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-background/90 to-transparent" />
+                  <span className="absolute bottom-2 left-2 text-xs font-semibold text-foreground">
+                    {game.emoji} {game.name}
+                  </span>
+                </div>
               ) : null;
             })}
           </div>
