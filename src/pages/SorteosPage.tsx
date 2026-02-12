@@ -10,6 +10,7 @@ const mockGiveaways = [
     myEntries: 3,
     active: true,
     rules: "1 participación por ticket aprobado",
+    image: "https://images.unsplash.com/photo-1613771404784-3a5686aa2be3?w=400&q=80",
   },
   {
     id: 2,
@@ -20,6 +21,7 @@ const mockGiveaways = [
     myEntries: 1,
     active: true,
     rules: "1 participación por reserva o evento",
+    image: "https://images.unsplash.com/photo-1608889825205-eebdb9fc5806?w=400&q=80",
   },
   {
     id: 3,
@@ -30,6 +32,7 @@ const mockGiveaways = [
     myEntries: 5,
     active: false,
     winner: "Carlos M.",
+    image: "https://images.unsplash.com/photo-1569003339405-ea396a5a8a90?w=400&q=80",
   },
 ];
 
@@ -45,7 +48,9 @@ const SorteosPage = () => {
       <section className="space-y-3">
         <h2 className="text-sm font-semibold text-display tracking-wider uppercase text-neon-pink">🎉 Activos</h2>
         {active.map((g) => (
-          <div key={g.id} className="bg-card rounded-xl p-4 border border-neon-pink/20 glow-orange space-y-3">
+          <div key={g.id} className="bg-card rounded-xl overflow-hidden border border-neon-pink/20 glow-orange space-y-3">
+            <img src={g.image} alt={g.title} className="w-full h-36 object-cover" />
+            <div className="px-4 pb-4 space-y-3">
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-sm font-semibold">{g.title}</p>
@@ -62,6 +67,7 @@ const SorteosPage = () => {
               <span className="text-sm font-bold text-primary text-display">{g.myEntries}</span>
             </div>
             <p className="text-[10px] text-muted-foreground">📋 {g.rules}</p>
+            </div>
           </div>
         ))}
       </section>
@@ -71,8 +77,9 @@ const SorteosPage = () => {
         <section className="space-y-3">
           <h2 className="text-sm font-semibold text-display tracking-wider uppercase text-muted-foreground">Finalizados</h2>
           {past.map((g) => (
-            <div key={g.id} className="bg-card rounded-xl p-4 border border-border/50 opacity-70">
-              <div className="flex items-center justify-between">
+            <div key={g.id} className="bg-card rounded-xl overflow-hidden border border-border/50 opacity-70">
+              <img src={g.image} alt={g.title} className="w-full h-28 object-cover" />
+              <div className="flex items-center justify-between p-4">
                 <div>
                   <p className="text-sm font-medium">{g.title}</p>
                   <p className="text-xs text-muted-foreground">Ganador: {g.winner}</p>
