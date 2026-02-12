@@ -1,0 +1,183 @@
+import { Receipt, ShoppingBag, Calendar, Gift, Bell, Star, Trophy, TrendingUp } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+
+const quickActions = [
+  { icon: Receipt, label: "Enviar Ticket", path: "/tickets", color: "text-primary" },
+  { icon: ShoppingBag, label: "Reservar", path: "/reservas", color: "text-neon-orange" },
+  { icon: Calendar, label: "Eventos", path: "/eventos", color: "text-neon-purple" },
+  { icon: Gift, label: "Sorteos", path: "/sorteos", color: "text-neon-pink" },
+  { icon: Bell, label: "TCG Alerts", path: "/tcg", color: "text-neon-green" },
+];
+
+const mockStats = {
+  points: 1250,
+  level: "Pro Gamer",
+  nextLevel: 2000,
+  coupons: 2,
+  activeReservations: 1,
+  upcomingEvents: 3,
+};
+
+const mockEvents = [
+  { id: 1, title: "Torneo Pokémon TCG", date: "15 Feb", spots: 4, category: "TCG" },
+  { id: 2, title: "Lanzamiento One Piece OP-10", date: "20 Feb", spots: 12, category: "Lanzamiento" },
+  { id: 3, title: "Quedada Warhammer", date: "22 Feb", spots: 8, category: "Evento" },
+];
+
+const mockGiveaways = [
+  { id: 1, title: "Booster Box Pokémon SV7", endDate: "28 Feb", entries: 42 },
+];
+
+const HomePage = () => {
+  const navigate = useNavigate();
+
+  const progressPercent = (mockStats.points / mockStats.nextLevel) * 100;
+
+  return (
+    <div className="px-4 pt-6 pb-4 max-w-lg mx-auto space-y-6 animate-fade-in">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="text-sm text-muted-foreground">Bienvenido de nuevo</p>
+          <h1 className="text-2xl font-bold text-gradient-neon">FrikiQuest</h1>
+        </div>
+        <button
+          onClick={() => navigate("/perfil")}
+          className="w-10 h-10 rounded-full bg-muted flex items-center justify-center border-glow"
+        >
+          <Star className="w-5 h-5 text-primary" />
+        </button>
+      </div>
+
+      {/* Points Card */}
+      <div className="relative overflow-hidden rounded-2xl bg-card p-5 border-glow glow-primary">
+        <div className="absolute top-0 right-0 w-32 h-32 gradient-neon opacity-10 rounded-full blur-3xl -translate-y-8 translate-x-8" />
+        <div className="relative z-10">
+          <div className="flex items-center justify-between mb-3">
+            <div>
+              <p className="text-xs text-muted-foreground text-display tracking-widest uppercase">Tus Puntos</p>
+              <p className="text-3xl font-bold text-primary text-display">{mockStats.points.toLocaleString()}</p>
+            </div>
+            <div className="text-right">
+              <div className="flex items-center gap-1.5">
+                <Trophy className="w-4 h-4 text-neon-orange" />
+                <span className="text-sm font-semibold text-neon-orange text-display">{mockStats.level}</span>
+              </div>
+            </div>
+          </div>
+          <div className="space-y-1.5">
+            <div className="flex justify-between text-xs text-muted-foreground">
+              <span>Progreso al siguiente nivel</span>
+              <span>{mockStats.points}/{mockStats.nextLevel}</span>
+            </div>
+            <div className="h-2 bg-muted rounded-full overflow-hidden">
+              <div
+                className="h-full gradient-neon rounded-full transition-all duration-500"
+                style={{ width: `${progressPercent}%` }}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Quick Actions */}
+      <div className="grid grid-cols-5 gap-2">
+        {quickActions.map(({ icon: Icon, label, path, color }) => (
+          <button
+            key={path}
+            onClick={() => navigate(path)}
+            className="flex flex-col items-center gap-1.5 p-3 rounded-xl bg-card hover:bg-surface-hover transition-colors border border-border/50"
+          >
+            <Icon className={`w-5 h-5 ${color}`} />
+            <span className="text-[10px] text-muted-foreground leading-tight text-center">{label}</span>
+          </button>
+        ))}
+      </div>
+
+      {/* Stats Row */}
+      <div className="grid grid-cols-3 gap-3">
+        {[
+          { label: "Cupones", value: mockStats.coupons, icon: Gift, color: "text-neon-orange" },
+          { label: "Reservas", value: mockStats.activeReservations, icon: ShoppingBag, color: "text-primary" },
+          { label: "Eventos", value: mockStats.upcomingEvents, icon: Calendar, color: "text-neon-purple" },
+        ].map(({ label, value, icon: Icon, color }) => (
+          <div key={label} className="bg-card rounded-xl p-3 border border-border/50 text-center">
+            <Icon className={`w-4 h-4 mx-auto mb-1 ${color}`} />
+            <p className="text-lg font-bold text-display">{value}</p>
+            <p className="text-[10px] text-muted-foreground">{label}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* Upcoming Events */}
+      <section>
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-sm font-semibold text-display tracking-wider uppercase">Próximos Eventos</h2>
+          <button onClick={() => navigate("/eventos")} className="text-xs text-primary">Ver todos</button>
+        </div>
+        <div className="space-y-2">
+          {mockEvents.map((event) => (
+            <div key={event.id} className="flex items-center gap-3 bg-card rounded-xl p-3 border border-border/50 hover:bg-surface-hover transition-colors">
+              <div className="w-12 h-12 rounded-lg bg-muted flex items-center justify-center shrink-0">
+                <Calendar className="w-5 h-5 text-neon-purple" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium truncate">{event.title}</p>
+                <p className="text-xs text-muted-foreground">{event.date} · {event.spots} plazas</p>
+              </div>
+              <span className="text-[10px] bg-muted px-2 py-1 rounded-full text-muted-foreground shrink-0">
+                {event.category}
+              </span>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Active Giveaway */}
+      {mockGiveaways.length > 0 && (
+        <section>
+          <h2 className="text-sm font-semibold text-display tracking-wider uppercase mb-3">Sorteo Activo 🎉</h2>
+          {mockGiveaways.map((g) => (
+            <button
+              key={g.id}
+              onClick={() => navigate("/sorteos")}
+              className="w-full text-left bg-card rounded-xl p-4 border border-neon-pink/30 glow-orange hover:bg-surface-hover transition-colors"
+            >
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-semibold">{g.title}</p>
+                  <p className="text-xs text-muted-foreground">Finaliza: {g.endDate} · {g.entries} participantes</p>
+                </div>
+                <Gift className="w-6 h-6 text-neon-pink" />
+              </div>
+            </button>
+          ))}
+        </section>
+      )}
+
+      {/* Activity */}
+      <section>
+        <h2 className="text-sm font-semibold text-display tracking-wider uppercase mb-3">Actividad Reciente</h2>
+        <div className="space-y-2">
+          {[
+            { text: "Ticket aprobado · +25 pts", time: "Hace 2h", icon: TrendingUp, color: "text-neon-green" },
+            { text: "Reserva confirmada: Gojo Fig.", time: "Ayer", icon: ShoppingBag, color: "text-primary" },
+            { text: "Inscripción: Torneo Pokémon", time: "Hace 3d", icon: Calendar, color: "text-neon-purple" },
+          ].map((item, i) => (
+            <div key={i} className="flex items-center gap-3 py-2">
+              <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center">
+                <item.icon className={`w-4 h-4 ${item.color}`} />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm">{item.text}</p>
+                <p className="text-xs text-muted-foreground">{item.time}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+    </div>
+  );
+};
+
+export default HomePage;
