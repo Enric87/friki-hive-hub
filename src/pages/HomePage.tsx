@@ -114,8 +114,8 @@ const HomePage = () => {
       {/* Stats Row */}
       <div className="grid grid-cols-3 gap-3">
         {[
-          { label: "Cupones", value: 0, icon: Gift, color: "text-neon-orange" },
-          { label: "Reservas", value: 0, icon: ShoppingBag, color: "text-primary" },
+          { label: "Cupones", value: 1, icon: Gift, color: "text-neon-orange" },
+          { label: "Reservas", value: 2, icon: ShoppingBag, color: "text-primary" },
           { label: "Eventos", value: mockEvents.length, icon: Calendar, color: "text-neon-purple" },
         ].map(({ label, value, icon: Icon, color }) => (
           <div key={label} className="bg-card rounded-2xl p-4 border border-border text-center">
