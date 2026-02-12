@@ -1,4 +1,5 @@
 import { Gift, ChevronRight, Trophy, Clock } from "lucide-react";
+import luffyImage from "@/assets/sorteos/luffy-gear5.png";
 
 const mockGiveaways = [
   {
@@ -21,7 +22,7 @@ const mockGiveaways = [
     myEntries: 1,
     active: true,
     rules: "1 participación por reserva o evento",
-    image: "https://images.unsplash.com/photo-1578632767115-351597cf2477?w=400&q=80",
+    image: luffyImage,
   },
   {
     id: 3,
