@@ -5,6 +5,7 @@ import torneoPokemonImg from "@/assets/eventos/torneo-pokemon.jpg";
 import lanzamientoOnepieceImg from "@/assets/eventos/lanzamiento-onepiece.jpg";
 import quedadaWarhammerImg from "@/assets/eventos/quedada-warhammer.jpg";
 import torneoYugiohImg from "@/assets/eventos/torneo-yugioh.jpg";
+import torneoTcgLeagueImg from "@/assets/eventos/torneo-tcg-league.jpg";
 
 type EventCategory = "all" | "TCG" | "Lanzamiento" | "Evento" | "Torneo";
 
@@ -56,6 +57,18 @@ const mockEvents = [
     price: "3€",
     registered: false,
     image: torneoYugiohImg,
+  },
+  {
+    id: 5,
+    title: "Liga TCG Semanal - Magic Modern",
+    date: "25 Feb 2026",
+    time: "18:00",
+    location: "Tienda - Sala Principal",
+    spots: { total: 20, taken: 8 },
+    category: "TCG" as const,
+    price: "3€",
+    registered: false,
+    image: torneoTcgLeagueImg,
   },
 ];
 
