@@ -20,7 +20,7 @@ const AppLayout = () => {
       </main>
 
       {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-card/95 backdrop-blur-lg safe-bottom">
+      <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-background/95 backdrop-blur-lg safe-bottom">
         <div className="flex items-center justify-around h-16 max-w-lg mx-auto px-2">
           {tabs.map(({ path, icon: Icon, label }) => {
             const isActive = location.pathname === path || 

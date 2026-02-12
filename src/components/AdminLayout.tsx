@@ -23,7 +23,7 @@ const AdminLayout = () => {
     <div className="flex min-h-screen bg-background">
       {/* Sidebar */}
       <aside
-        className={`fixed inset-y-0 left-0 z-40 flex flex-col bg-card border-r border-border transition-all duration-300 ${
+        className={`fixed inset-y-0 left-0 z-40 flex flex-col bg-background border-r border-border transition-all duration-300 ${
           sidebarOpen ? "w-60" : "w-16"
         }`}
       >
