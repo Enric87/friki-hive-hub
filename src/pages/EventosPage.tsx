@@ -1,6 +1,11 @@
 import { useState } from "react";
 import { Calendar, MapPin, Users, Clock, ChevronRight } from "lucide-react";
 
+import torneoPokemonImg from "@/assets/eventos/torneo-pokemon.jpg";
+import lanzamientoOnepieceImg from "@/assets/eventos/lanzamiento-onepiece.jpg";
+import quedadaWarhammerImg from "@/assets/eventos/quedada-warhammer.jpg";
+import torneoYugiohImg from "@/assets/eventos/torneo-yugioh.jpg";
+
 type EventCategory = "all" | "TCG" | "Lanzamiento" | "Evento" | "Torneo";
 
 const mockEvents = [
@@ -14,6 +19,7 @@ const mockEvents = [
     category: "Torneo" as const,
     price: "5€",
     registered: false,
+    image: torneoPokemonImg,
   },
   {
     id: 2,
@@ -25,6 +31,7 @@ const mockEvents = [
     category: "Lanzamiento" as const,
     price: null,
     registered: true,
+    image: lanzamientoOnepieceImg,
   },
   {
     id: 3,
@@ -36,6 +43,7 @@ const mockEvents = [
     category: "Evento" as const,
     price: null,
     registered: false,
+    image: quedadaWarhammerImg,
   },
   {
     id: 4,
@@ -47,6 +55,7 @@ const mockEvents = [
     category: "Torneo" as const,
     price: "3€",
     registered: false,
+    image: torneoYugiohImg,
   },
 ];
 
@@ -89,7 +98,9 @@ const EventosPage = () => {
         {filtered.map((event) => {
           const full = event.spots.taken >= event.spots.total;
           return (
-            <div key={event.id} className="bg-card rounded-xl p-4 border border-border/50 space-y-3">
+            <div key={event.id} className="bg-card rounded-xl overflow-hidden border border-border/50 space-y-3">
+              <img src={event.image} alt={event.title} className="w-full h-36 object-cover" />
+              <div className="px-4 pb-4 space-y-3">
               <div className="flex items-start justify-between">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
@@ -128,6 +139,7 @@ const EventosPage = () => {
                   {full ? "Completo" : "Inscribirme"}
                 </button>
               )}
+              </div>
             </div>
           );
         })}

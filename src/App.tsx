@@ -21,6 +21,7 @@ import AdminEventos from "./pages/admin/AdminEventos";
 import AdminSorteos from "./pages/admin/AdminSorteos";
 import AdminChatbot from "./pages/admin/AdminChatbot";
 import NotFound from "./pages/NotFound";
+import LandingPage from "./pages/LandingPage";
 
 const queryClient = new QueryClient();
 
@@ -31,6 +32,8 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
+          {/* Landing */}
+          <Route path="/welcome" element={<LandingPage />} />
           {/* Client App */}
           <Route element={<AppLayout />}>
             <Route path="/" element={<HomePage />} />
