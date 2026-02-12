@@ -19,6 +19,7 @@ import TCGPage from "./pages/TCGPage";
 import ChatbotPage from "./pages/ChatbotPage";
 import PerfilPage from "./pages/PerfilPage";
 import RecompensasPage from "./pages/RecompensasPage";
+import HistorialPage from "./pages/HistorialPage";
 import ContactoPage from "./pages/ContactoPage";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminTickets from "./pages/admin/AdminTickets";
@@ -56,6 +57,7 @@ const App = () => (
                 <Route path="/perfil" element={<PerfilPage />} />
                 <Route path="/cupones" element={<PerfilPage />} />
                 <Route path="/recompensas" element={<RecompensasPage />} />
+                <Route path="/historial" element={<HistorialPage />} />
                 <Route path="/contacto" element={<ContactoPage />} />
               </Route>
               {/* Admin Panel */}

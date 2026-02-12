@@ -3,6 +3,8 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Plus, Pencil, Trash2, Loader2, Gift } from "lucide-react";
 
+const AVAILABLE_TAGS = ["Popular", "Limitado", "Exclusivo", "Nuevo"];
+
 const AdminRecompensas = () => {
   const queryClient = useQueryClient();
   const [editing, setEditing] = useState<any>(null);
@@ -56,16 +58,24 @@ const AdminRecompensas = () => {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["admin_rewards"] }),
   });
 
-  const emptyReward = { name: "", description: "", points_cost: 100, reward_type: "discount", stock: null, active: true, image_url: "" };
+  const emptyReward = { name: "", description: "", points_cost: 100, reward_type: "discount", stock: null, active: true, image_url: "", tags: [] as string[] };
 
   const handleEdit = (r: any) => {
-    setEditing({ ...r });
+    setEditing({ ...r, tags: r.tags || [] });
     setShowForm(true);
   };
 
   const handleNew = () => {
     setEditing({ ...emptyReward });
     setShowForm(true);
+  };
+
+  const toggleTag = (tag: string) => {
+    const current: string[] = editing.tags || [];
+    setEditing({
+      ...editing,
+      tags: current.includes(tag) ? current.filter((t: string) => t !== tag) : [...current, tag],
+    });
   };
 
   return (
@@ -116,6 +126,26 @@ const AdminRecompensas = () => {
               onChange={(e) => setEditing({ ...editing, image_url: e.target.value })}
               className="col-span-2 px-3 py-2 rounded-lg bg-muted border border-border text-sm"
             />
+            {/* Tags */}
+            <div className="col-span-2">
+              <p className="text-xs text-muted-foreground mb-2">Etiquetas</p>
+              <div className="flex flex-wrap gap-2">
+                {AVAILABLE_TAGS.map((tag) => (
+                  <button
+                    key={tag}
+                    type="button"
+                    onClick={() => toggleTag(tag)}
+                    className={`text-xs px-3 py-1 rounded-full border transition-colors ${
+                      (editing.tags || []).includes(tag)
+                        ? "bg-primary text-primary-foreground border-primary"
+                        : "bg-muted text-muted-foreground border-border"
+                    }`}
+                  >
+                    {tag}
+                  </button>
+                ))}
+              </div>
+            </div>
             <label className="flex items-center gap-2 text-sm">
               <input
                 type="checkbox"
@@ -150,6 +180,7 @@ const AdminRecompensas = () => {
                 <th className="p-3">Nombre</th>
                 <th className="p-3">Puntos</th>
                 <th className="p-3">Stock</th>
+                <th className="p-3">Etiquetas</th>
                 <th className="p-3">Estado</th>
                 <th className="p-3">Acciones</th>
               </tr>
@@ -160,6 +191,13 @@ const AdminRecompensas = () => {
                   <td className="p-3 font-medium">{r.name}</td>
                   <td className="p-3 text-primary text-display">{r.points_cost}</td>
                   <td className="p-3">{r.stock ?? "∞"}</td>
+                  <td className="p-3">
+                    <div className="flex gap-1 flex-wrap">
+                      {((r as any).tags as string[] || []).map((tag: string) => (
+                        <span key={tag} className="text-[10px] px-1.5 py-0.5 rounded-full bg-primary/10 text-primary">{tag}</span>
+                      ))}
+                    </div>
+                  </td>
                   <td className="p-3">
                     <span className={`text-xs px-2 py-0.5 rounded-full ${r.active ? "bg-neon-green/10 text-neon-green" : "bg-muted text-muted-foreground"}`}>
                       {r.active ? "Activa" : "Inactiva"}

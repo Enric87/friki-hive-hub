@@ -1,8 +1,9 @@
-import { Star, Trophy, Gift, ChevronRight, LogOut, Loader2, Award } from "lucide-react";
+import { Star, Trophy, Gift, ChevronRight, LogOut, Loader2, Award, Receipt, Calendar, ShoppingBag } from "lucide-react";
 import { useProfile, useLevels, useAchievements } from "@/hooks/useProfile";
 import { useMyRedemptions } from "@/hooks/useRewards";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { useProfileStats } from "@/hooks/useProfileStats";
 
 const PerfilPage = () => {
   const navigate = useNavigate();
@@ -11,6 +12,7 @@ const PerfilPage = () => {
   const { data: levels, isLoading: loadingLevels } = useLevels();
   const { data: redemptions } = useMyRedemptions();
   const { allAchievements, userAchievements } = useAchievements();
+  const { data: stats } = useProfileStats();
 
   const handleSignOut = async () => {
     await signOut();
@@ -30,6 +32,12 @@ const PerfilPage = () => {
   const nextLevel = levels?.find((l) => l.min_points > currentPoints);
   const activeCoupons = redemptions?.filter((r) => r.status === "disponible") ?? [];
   const unlockedIds = new Set(userAchievements.data?.map((ua) => ua.achievement_id) ?? []);
+
+  const profileStats = [
+    { label: "Puntos", value: currentPoints.toLocaleString(), icon: Star, color: "text-primary" },
+    { label: "Canjes", value: stats?.redemptionCount ?? 0, icon: Gift, color: "text-neon-orange" },
+    { label: "Logros", value: userAchievements.data?.length ?? 0, icon: Award, color: "text-neon-purple" },
+  ];
 
   return (
     <div className="px-4 pt-6 pb-4 max-w-lg mx-auto space-y-6 animate-fade-in">
@@ -62,6 +70,17 @@ const PerfilPage = () => {
             </div>
           </div>
         )}
+      </div>
+
+      {/* Stats Grid */}
+      <div className="grid grid-cols-3 gap-3">
+        {profileStats.map(({ label, value, icon: Icon, color }) => (
+          <div key={label} className="bg-card rounded-xl p-3 border border-border text-center">
+            <Icon className={`w-5 h-5 mx-auto mb-1 ${color}`} />
+            <p className="text-lg font-bold text-display">{value}</p>
+            <p className="text-[10px] text-muted-foreground">{label}</p>
+          </div>
+        ))}
       </div>
 
       {/* Levels */}
@@ -131,6 +150,15 @@ const PerfilPage = () => {
           </div>
         </section>
       )}
+
+      {/* History link */}
+      <button
+        onClick={() => navigate("/historial")}
+        className="w-full flex items-center justify-between py-3 px-4 rounded-xl bg-card border border-border text-sm font-medium"
+      >
+        <span>Ver historial de actividad</span>
+        <ChevronRight className="w-4 h-4 text-muted-foreground" />
+      </button>
 
       <button
         onClick={handleSignOut}

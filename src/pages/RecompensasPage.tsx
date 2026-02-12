@@ -2,6 +2,23 @@ import { useState } from "react";
 import { Gift, Ticket, Loader2, AlertCircle, CheckCircle2 } from "lucide-react";
 import { useRewards, useMyRedemptions, useRedeemReward } from "@/hooks/useRewards";
 import { useProfile } from "@/hooks/useProfile";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+
+const tagStyles: Record<string, string> = {
+  Popular: "bg-neon-orange/10 text-neon-orange border-neon-orange/20",
+  Limitado: "bg-destructive/10 text-destructive border-destructive/20",
+  Exclusivo: "bg-neon-purple/10 text-neon-purple border-neon-purple/20",
+  Nuevo: "bg-neon-green/10 text-neon-green border-neon-green/20",
+};
 
 const RecompensasPage = () => {
   const [tab, setTab] = useState<"catalogo" | "misCanjes">("catalogo");
@@ -10,13 +27,15 @@ const RecompensasPage = () => {
   const { data: profile } = useProfile();
   const redeemMutation = useRedeemReward();
   const [lastCoupon, setLastCoupon] = useState<{ code: string; name: string } | null>(null);
+  const [confirmReward, setConfirmReward] = useState<{ id: string; name: string; cost: number } | null>(null);
 
   const handleRedeem = async (rewardId: string) => {
     try {
       const result = await redeemMutation.mutateAsync(rewardId);
       setLastCoupon({ code: result.coupon_code!, name: result.reward_name! });
+      setConfirmReward(null);
     } catch {
-      // error handled by mutation
+      setConfirmReward(null);
     }
   };
 
@@ -89,47 +108,61 @@ const RecompensasPage = () => {
             {rewards.map((r) => {
               const canAfford = (profile?.points ?? 0) >= r.points_cost;
               const outOfStock = r.stock !== null && r.stock <= 0;
+              const tags = (r as any).tags as string[] | null;
               return (
-                <div key={r.id} className="bg-card rounded-2xl p-4 border border-border flex gap-4">
-                  <div className="w-16 h-16 rounded-xl bg-muted flex items-center justify-center shrink-0 text-2xl">
-                    {r.image_url ? (
-                      <img src={r.image_url} alt={r.name} className="w-full h-full rounded-xl object-cover" />
-                    ) : (
-                      "🎁"
-                    )}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold truncate">{r.name}</p>
-                    <p className="text-xs text-muted-foreground line-clamp-2">{r.description}</p>
-                    <div className="flex items-center justify-between mt-2">
-                      <span className="text-sm font-bold text-primary text-display">
-                        {r.points_cost.toLocaleString()} pts
-                      </span>
-                      {r.stock !== null && (
-                        <span className="text-[10px] text-muted-foreground">
-                          {r.stock > 0 ? `${r.stock} disponibles` : "Agotado"}
+                <div key={r.id} className="bg-card rounded-2xl p-4 border border-border">
+                  {/* Tags */}
+                  {tags && tags.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5 mb-3">
+                      {tags.map((tag) => (
+                        <span
+                          key={tag}
+                          className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${tagStyles[tag] || "bg-muted text-muted-foreground border-border"}`}
+                        >
+                          {tag}
                         </span>
+                      ))}
+                    </div>
+                  )}
+                  <div className="flex gap-4">
+                    <div className="w-16 h-16 rounded-xl bg-muted flex items-center justify-center shrink-0 text-2xl">
+                      {r.image_url ? (
+                        <img src={r.image_url} alt={r.name} className="w-full h-full rounded-xl object-cover" />
+                      ) : (
+                        "🎁"
                       )}
                     </div>
-                    <button
-                      onClick={() => handleRedeem(r.id)}
-                      disabled={!canAfford || outOfStock || redeemMutation.isPending}
-                      className={`mt-2 w-full py-1.5 rounded-lg text-xs font-medium border transition-colors ${
-                        canAfford && !outOfStock
-                          ? "bg-primary/10 text-primary border-primary/20 hover:bg-primary/20"
-                          : "bg-muted text-muted-foreground border-border cursor-not-allowed"
-                      }`}
-                    >
-                      {redeemMutation.isPending ? (
-                        <Loader2 className="w-3 h-3 animate-spin mx-auto" />
-                      ) : outOfStock ? (
-                        "Agotado"
-                      ) : !canAfford ? (
-                        `Necesitas ${(r.points_cost - (profile?.points ?? 0)).toLocaleString()} pts más`
-                      ) : (
-                        "Canjear"
-                      )}
-                    </button>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold truncate">{r.name}</p>
+                      <p className="text-xs text-muted-foreground line-clamp-2">{r.description}</p>
+                      <div className="flex items-center justify-between mt-2">
+                        <span className="text-lg font-bold text-primary text-display">
+                          {r.points_cost.toLocaleString()} pts
+                        </span>
+                        {r.stock !== null && (
+                          <span className="text-[10px] text-muted-foreground">
+                            {r.stock > 0 ? `${r.stock} disponibles` : "Agotado"}
+                          </span>
+                        )}
+                      </div>
+                      <button
+                        onClick={() => setConfirmReward({ id: r.id, name: r.name, cost: r.points_cost })}
+                        disabled={!canAfford || outOfStock || redeemMutation.isPending}
+                        className={`mt-2 w-full py-2 rounded-lg text-xs font-semibold border transition-colors ${
+                          canAfford && !outOfStock
+                            ? "bg-primary/10 text-primary border-primary/20 hover:bg-primary/20"
+                            : "bg-muted text-muted-foreground border-border cursor-not-allowed"
+                        }`}
+                      >
+                        {outOfStock ? (
+                          "Agotado"
+                        ) : !canAfford ? (
+                          `Necesitas ${(r.points_cost - (profile?.points ?? 0)).toLocaleString()} pts más`
+                        ) : (
+                          "Canjear"
+                        )}
+                      </button>
+                    </div>
                   </div>
                 </div>
               );
@@ -169,6 +202,28 @@ const RecompensasPage = () => {
           })}
         </div>
       )}
+
+      {/* Confirmation Dialog */}
+      <AlertDialog open={!!confirmReward} onOpenChange={(open) => !open && setConfirmReward(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Canjear {confirmReward?.name}?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Se descontarán <strong className="text-primary">{confirmReward?.cost.toLocaleString()} puntos</strong> de tu saldo.
+              Esta acción no se puede deshacer.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => confirmReward && handleRedeem(confirmReward.id)}
+              disabled={redeemMutation.isPending}
+            >
+              {redeemMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : "Confirmar canje"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
