@@ -119,7 +119,7 @@ const HomePage = () => {
           { label: "Eventos", value: mockEvents.length, icon: Calendar, color: "text-neon-purple" },
         ].map(({ label, value, icon: Icon, color }) => (
           <div key={label} className="bg-card rounded-2xl p-4 border border-border text-center">
-            <Icon className={`w-5 h-5 mx-auto mb-1.5 ${color}`} />
+            <Icon className={`w-7 h-7 mx-auto mb-1.5 ${color}`} />
             <p className="text-2xl font-bold text-display">{value}</p>
             <p className="text-xs text-muted-foreground">{label}</p>
           </div>
