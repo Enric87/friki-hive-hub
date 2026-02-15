@@ -1,40 +1,13 @@
 
-# PDR FrikiQuest -- Plan de Implementacion MVP
 
-## Estado de implementacion
+## Quitar botón "TCG Alerts" de la Home
 
-| Tarea | Estado |
-|---|---|
-| Componentes globales (StateEmpty, StateError, StateSkeleton) | ✅ Completado |
-| Chat: chips navegables + typing + intents expandidos | ✅ Completado |
-| Seed de 6 recompensas demo | ✅ Completado |
-| Migracion tickets + storage + points_ledger | ✅ Completado |
-| TicketsPage: upload real + detalle + estados | ✅ Completado |
-| HistorialPage: ledger completo + saldo | ✅ Completado |
-| Hooks: useTickets, usePointsLedger | ✅ Completado |
-| RecompensasPage: empty state mejorado | Pendiente (ya tiene seed, funciona) |
-| EventosPage/ReservasPage: estados globales | Pendiente (siguen mock) |
+Se eliminará el botón de acceso rápido "TCG Alerts" de la página principal (`src/pages/HomePage.tsx`).
 
-## Archivos creados
+### Cambios
 
-- `src/components/StateEmpty.tsx`
-- `src/components/StateError.tsx`
-- `src/components/StateSkeleton.tsx`
-- `src/hooks/useTickets.ts`
-- `src/hooks/usePointsLedger.ts`
+**`src/pages/HomePage.tsx`**
+- Eliminar la entrada `{ icon: Bell, label: "TCG Alerts", path: "/tcg", color: "text-neon-green", badge: 3 }` del array `quickActions` (línea 10)
+- Eliminar la importación de `Bell` de lucide-react (ya no se usa)
+- Los 3 botones restantes (Enviar Ticket, Reservar, Eventos) se redistribuirán automáticamente en el grid de 4 columnas, o se puede ajustar a `grid-cols-3` para que queden centrados
 
-## Archivos modificados
-
-- `src/pages/ChatbotPage.tsx` - Chips con navigate, typing indicator, intents expandidos, fallback con acciones
-- `src/pages/TicketsPage.tsx` - Upload real, datos de DB, detalle con dialogo, estados globales
-- `src/pages/HistorialPage.tsx` - Ledger completo, saldo, timeline unificada
-
-## Tablas creadas
-
-- `public.tickets` (con RLS)
-- `public.points_ledger` (con RLS)
-- Storage bucket `ticket-images`
-
-## Datos insertados
-
-- 6 recompensas seed en tabla `rewards`
