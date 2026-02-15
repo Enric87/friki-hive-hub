@@ -1,4 +1,4 @@
-import { Receipt, ShoppingBag, Calendar, Gift, Bell, Star, Trophy, TrendingUp, CheckCircle, Award } from "lucide-react";
+import { Receipt, ShoppingBag, Calendar, Gift, Star, Trophy, TrendingUp, CheckCircle, Award } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useProfile } from "@/hooks/useProfile";
 import { useStore } from "@/contexts/StoreContext";
@@ -7,7 +7,6 @@ const quickActions = [
   { icon: Receipt, label: "Enviar Ticket", path: "/tickets", color: "text-primary" },
   { icon: ShoppingBag, label: "Reservar", path: "/reservas", color: "text-neon-orange" },
   { icon: Calendar, label: "Eventos", path: "/eventos", color: "text-neon-purple" },
-  { icon: Bell, label: "TCG Alerts", path: "/tcg", color: "text-neon-green", badge: 3 },
 ];
 
 const mockEvents = [
@@ -76,20 +75,15 @@ const HomePage = () => {
       </div>
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-4 gap-3">
-        {quickActions.map(({ icon: Icon, label, path, color, badge }) => (
+      <div className="grid grid-cols-3 gap-3">
+        {quickActions.map(({ icon: Icon, label, path, color }) => (
           <button
             key={path}
             onClick={() => navigate(path)}
             className="relative flex flex-col items-center gap-2 p-4 rounded-2xl bg-card hover:bg-surface-hover transition-colors border border-border"
           >
-            <div className="relative">
+            <div>
               <Icon className={`w-6 h-6 ${color}`} />
-              {badge && (
-                <span className="absolute -top-2 -right-3 w-5 h-5 rounded-full bg-neon-green text-[10px] font-bold text-white flex items-center justify-center">
-                  {badge}
-                </span>
-              )}
             </div>
             <span className="text-xs text-muted-foreground leading-tight text-center">{label}</span>
           </button>
