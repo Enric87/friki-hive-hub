@@ -1,10 +1,48 @@
-import { Loader2, Gift, ArrowLeft } from "lucide-react";
-import { useMyRedemptions } from "@/hooks/useRewards";
+import { ArrowLeft, TrendingUp, TrendingDown, Gift, Receipt, Settings } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { usePointsLedger } from "@/hooks/usePointsLedger";
+import { useMyRedemptions } from "@/hooks/useRewards";
+import { useProfile } from "@/hooks/useProfile";
+import StateEmpty from "@/components/StateEmpty";
+import StateError from "@/components/StateError";
+import StateSkeleton from "@/components/StateSkeleton";
+
+const typeConfig: Record<string, { label: string; icon: typeof Gift; color: string }> = {
+  ticket_approved: { label: "Ticket aprobado", icon: Receipt, color: "text-neon-green" },
+  reward_redeemed: { label: "Canje de recompensa", icon: Gift, color: "text-destructive" },
+  manual_adjustment: { label: "Ajuste manual", icon: Settings, color: "text-primary" },
+};
 
 const HistorialPage = () => {
   const navigate = useNavigate();
-  const { data: redemptions, isLoading } = useMyRedemptions();
+  const { data: ledger, isLoading: loadingLedger, isError: errorLedger, refetch: refetchLedger } = usePointsLedger();
+  const { data: redemptions, isLoading: loadingRedemptions } = useMyRedemptions();
+  const { data: profile } = useProfile();
+
+  const isLoading = loadingLedger || loadingRedemptions;
+
+  // Combine ledger + redemptions into a unified timeline
+  const timeline = [
+    ...(ledger || []).map((entry: any) => ({
+      id: entry.id,
+      date: entry.created_at,
+      delta: entry.delta,
+      type: entry.type,
+      note: entry.note,
+      source: "ledger" as const,
+    })),
+    // If no ledger entries, show redemptions as fallback
+    ...(!ledger?.length && redemptions?.length
+      ? redemptions.map((rd: any) => ({
+          id: rd.id,
+          date: rd.redeemed_at,
+          delta: -(rd.rewards?.points_cost || 0),
+          type: "reward_redeemed",
+          note: rd.rewards?.name || "Recompensa",
+          source: "redemption" as const,
+        }))
+      : []),
+  ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
   return (
     <div className="px-4 pt-6 pb-4 max-w-lg mx-auto space-y-5 animate-fade-in">
@@ -15,45 +53,60 @@ const HistorialPage = () => {
         <h1 className="text-xl font-bold text-display">Historial de Actividad</h1>
       </div>
 
+      {/* Balance card */}
+      {profile && (
+        <div className="bg-card rounded-xl p-4 border border-border text-center">
+          <p className="text-xs text-muted-foreground">Saldo actual</p>
+          <p className="text-2xl font-bold text-primary text-display">{profile.points.toLocaleString()} pts</p>
+          <p className="text-xs text-muted-foreground mt-1">Nivel: {profile.level}</p>
+        </div>
+      )}
+
       {isLoading ? (
-        <div className="flex justify-center py-12">
-          <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
-        </div>
-      ) : !redemptions?.length ? (
-        <div className="text-center py-16 text-muted-foreground">
-          <Gift className="w-12 h-12 mx-auto mb-3 opacity-30" />
-          <p className="text-sm">Aún no tienes actividad</p>
-          <p className="text-xs mt-1">Tu historial de canjes aparecerá aquí 📜</p>
-        </div>
+        <StateSkeleton count={4} type="row" />
+      ) : errorLedger ? (
+        <StateError onRetry={() => refetchLedger()} />
+      ) : !timeline.length ? (
+        <StateEmpty
+          icon={Gift}
+          title="Aún no tienes actividad"
+          subtitle="Tu historial de puntos aparecerá aquí 📜"
+        />
       ) : (
         <div className="relative">
-          {/* Timeline line */}
           <div className="absolute left-4 top-2 bottom-2 w-px bg-border" />
-
-          <div className="space-y-4">
-            {redemptions.map((rd) => {
-              const statusLabel = rd.status === "disponible" ? "Activo" : rd.status === "usado" ? "Usado" : "Caducado";
-              const statusColor = rd.status === "disponible" ? "text-neon-green" : "text-muted-foreground";
+          <div className="space-y-3">
+            {timeline.map((entry) => {
+              const cfg = typeConfig[entry.type] || typeConfig.manual_adjustment;
+              const EntryIcon = cfg.icon;
+              const isPositive = entry.delta > 0;
               return (
-                <div key={rd.id} className="flex gap-4 pl-1">
-                  <div className="w-7 h-7 rounded-full bg-card border-2 border-primary flex items-center justify-center shrink-0 z-10">
-                    <Gift className="w-3.5 h-3.5 text-primary" />
+                <div key={entry.id} className="flex gap-4 pl-1">
+                  <div className={`w-7 h-7 rounded-full bg-card border-2 ${isPositive ? "border-neon-green" : "border-destructive"} flex items-center justify-center shrink-0 z-10`}>
+                    {isPositive ? (
+                      <TrendingUp className="w-3.5 h-3.5 text-neon-green" />
+                    ) : (
+                      <TrendingDown className="w-3.5 h-3.5 text-destructive" />
+                    )}
                   </div>
                   <div className="bg-card rounded-xl p-3 border border-border flex-1">
                     <div className="flex items-center justify-between mb-1">
-                      <p className="text-sm font-semibold">{(rd as any).rewards?.name || "Recompensa"}</p>
-                      <span className={`text-[10px] font-medium ${statusColor}`}>{statusLabel}</span>
+                      <p className="text-sm font-medium">{entry.note || cfg.label}</p>
+                      <span className={`text-sm font-bold ${isPositive ? "text-neon-green" : "text-destructive"}`}>
+                        {isPositive ? "+" : ""}{entry.delta}
+                      </span>
                     </div>
-                    <code className="text-xs font-bold text-primary text-display">{rd.coupon_code}</code>
-                    <p className="text-[10px] text-muted-foreground mt-1">
-                      {new Date(rd.redeemed_at).toLocaleDateString("es-ES", {
-                        day: "numeric",
-                        month: "short",
-                        year: "numeric",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
-                    </p>
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] text-muted-foreground">{cfg.label}</span>
+                      <span className="text-[10px] text-muted-foreground">
+                        {new Date(entry.date).toLocaleDateString("es-ES", {
+                          day: "numeric",
+                          month: "short",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </span>
+                    </div>
                   </div>
                 </div>
               );

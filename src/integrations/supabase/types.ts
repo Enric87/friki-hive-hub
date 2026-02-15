@@ -74,6 +74,36 @@ export type Database = {
         }
         Relationships: []
       }
+      points_ledger: {
+        Row: {
+          created_at: string
+          delta: number
+          id: string
+          note: string | null
+          ref_id: string | null
+          type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          delta: number
+          id?: string
+          note?: string | null
+          ref_id?: string | null
+          type?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          delta?: number
+          id?: string
+          note?: string | null
+          ref_id?: string | null
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -232,6 +262,42 @@ export type Database = {
           store_name?: string
           updated_at?: string
           whatsapp_url?: string | null
+        }
+        Relationships: []
+      }
+      tickets: {
+        Row: {
+          created_at: string
+          id: string
+          image_url: string | null
+          points_awarded: number
+          rejection_reason: string | null
+          reviewed_at: string | null
+          status: string
+          total_amount: number | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          points_awarded?: number
+          rejection_reason?: string | null
+          reviewed_at?: string | null
+          status?: string
+          total_amount?: number | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          points_awarded?: number
+          rejection_reason?: string | null
+          reviewed_at?: string | null
+          status?: string
+          total_amount?: number | null
+          user_id?: string
         }
         Relationships: []
       }
