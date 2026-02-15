@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
-import { Send, Bot, User, ShoppingBag, Calendar, Gift, Star, Phone } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Send, Bot, User, ShoppingBag, Calendar, Gift, Star, Phone, Loader2 } from "lucide-react";
 
 type Message = {
   id: number;
@@ -24,40 +25,72 @@ const initialMessages: Message[] = [
 
 const botResponses: Record<string, string> = {
   horario: "🕐 Nuestro horario es:\nLunes a Viernes: 10:00 – 20:00\nSábados: 10:00 – 14:00 y 17:00 – 20:00\nDomingos: Cerrado",
-  puntos: "⭐ Tienes 1.250 puntos acumulados. Nivel: Pro Gamer. ¡Te faltan 750 para subir a Legendario!",
+  puntos: "⭐ Puedes ver tu saldo y movimientos en la sección de Perfil. ¡Cada compra suma puntos!",
   reserva: "📦 Para reservar una figura, ve a la sección Reservas y elige el producto. También puedes pedir info aquí sobre cualquier figura.",
-  eventos: "📅 Próximos eventos:\n• 15 Feb - Torneo Pokémon TCG (4 plazas)\n• 20 Feb - Lanzamiento One Piece OP-10\n• 22 Feb - Quedada Warhammer",
+  eventos: "📅 Consulta los próximos eventos en la sección Eventos. Hay torneos, lanzamientos y quedadas.",
   devolucion: "🔄 Aceptamos devoluciones en 15 días con ticket original y producto sin abrir. Para TCG sellado, 7 días.",
   stock: "📋 No tengo esa info en este momento. Te sugiero reservar para ser el primero cuando llegue, o pregunta directamente en tienda.",
+  contacto: "📞 Puedes contactar con la tienda por WhatsApp o llamando directamente. ¡Estaremos encantados de ayudarte!",
+  cupon: "🎟️ Los cupones se generan al canjear recompensas. Ve a Recompensas para ver el catálogo y canjear tus puntos.",
+  nivel: "🏆 Tu nivel sube automáticamente al acumular puntos. Cada nivel desbloquea beneficios exclusivos.",
+  ayuda: "🤝 Puedo ayudarte con: puntos, reservas, eventos, devoluciones, cupones y más. ¡Pregúntame!",
+  tienda: "🏪 Somos tu tienda friki de confianza. Manga, figuras, TCG, Warhammer y mucho más.",
+  ticket: "🧾 Para subir un ticket de compra, ve a la sección Tickets y saca una foto. ¡Ganarás puntos automáticamente!",
+  sorteo: "🎉 Los sorteos activos están en la sección Sorteos. Participa con tus puntos para ganar premios exclusivos.",
+  recompensa: "🎁 En la sección Recompensas puedes canjear tus puntos por descuentos, productos y más.",
+  manga: "📚 Tenemos las últimas novedades en manga. Si buscas algo en concreto, ¡pregunta en tienda o haz una reserva!",
+  figura: "🗿 Consulta las figuras disponibles en Reservas. Si no ves la que buscas, podemos encargarla.",
+  warhammer: "⚔️ Tenemos miniaturas, pinturas y eventos de Warhammer. ¡Mira los próximos eventos!",
+  pokemon: "⚡ Cartas Pokémon, boosters y torneos semanales. ¡Consulta los próximos torneos en Eventos!",
+  direccion: "📍 Encuéntranos en la sección Contacto para ver nuestra dirección y cómo llegar.",
 };
 
+const fallbackActions = [
+  { label: "Ver puntos", icon: Star, path: "/perfil" },
+  { label: "Eventos", icon: Calendar, path: "/eventos" },
+  { label: "Contactar tienda", icon: Phone, path: "/contacto" },
+];
+
 const ChatbotPage = () => {
+  const navigate = useNavigate();
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [input, setInput] = useState("");
+  const [isTyping, setIsTyping] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
-  }, [messages]);
+  }, [messages, isTyping]);
 
   const handleSend = () => {
-    if (!input.trim()) return;
+    if (!input.trim() || isTyping) return;
     const userMsg: Message = { id: Date.now(), role: "user", text: input.trim() };
     setMessages((prev) => [...prev, userMsg]);
+    const query = input;
     setInput("");
+    setIsTyping(true);
 
     setTimeout(() => {
-      const lower = input.toLowerCase();
-      let response = "🤔 No tengo esa info ahora. ¿Quieres que te ponga en contacto con la tienda?";
+      const lower = query.toLowerCase();
+      let response = "";
+      let actions: Message["actions"] = undefined;
+
       for (const [key, val] of Object.entries(botResponses)) {
         if (lower.includes(key)) {
           response = val;
           break;
         }
       }
-      const botMsg: Message = { id: Date.now() + 1, role: "bot", text: response };
+
+      if (!response) {
+        response = "🤔 No tengo esa info ahora. ¿Quizás te interese algo de esto?";
+        actions = fallbackActions;
+      }
+
+      const botMsg: Message = { id: Date.now() + 1, role: "bot", text: response, actions };
       setMessages((prev) => [...prev, botMsg]);
-    }, 600);
+      setIsTyping(false);
+    }, 600 + Math.random() * 400);
   };
 
   return (
@@ -90,7 +123,11 @@ const ChatbotPage = () => {
               {msg.actions && (
                 <div className="flex flex-wrap gap-1.5">
                   {msg.actions.map((a) => (
-                    <button key={a.label} className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-muted text-xs hover:bg-surface-hover transition-colors">
+                    <button
+                      key={a.label}
+                      onClick={() => navigate(a.path)}
+                      className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-muted text-xs hover:bg-surface-hover transition-colors"
+                    >
                       <a.icon className="w-3 h-3 text-primary" />
                       {a.label}
                     </button>
@@ -105,6 +142,17 @@ const ChatbotPage = () => {
             )}
           </div>
         ))}
+        {isTyping && (
+          <div className="flex gap-2 justify-start">
+            <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-1">
+              <Bot className="w-4 h-4 text-primary" />
+            </div>
+            <div className="rounded-2xl px-3.5 py-2.5 bg-card border border-border/50 rounded-bl-md flex items-center gap-1.5">
+              <Loader2 className="w-3.5 h-3.5 animate-spin text-muted-foreground" />
+              <span className="text-xs text-muted-foreground">Escribiendo...</span>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Input */}
@@ -119,7 +167,8 @@ const ChatbotPage = () => {
           />
           <button
             onClick={handleSend}
-            className="w-10 h-10 rounded-xl bg-primary text-primary-foreground flex items-center justify-center hover:opacity-90 transition-opacity"
+            disabled={isTyping || !input.trim()}
+            className="w-10 h-10 rounded-xl bg-primary text-primary-foreground flex items-center justify-center hover:opacity-90 transition-opacity disabled:opacity-50"
           >
             <Send className="w-4 h-4" />
           </button>
