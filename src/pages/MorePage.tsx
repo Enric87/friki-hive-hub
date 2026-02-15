@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { Bell, Gift, User, Star, Trophy, ChevronRight, Award, MapPin, Clock } from "lucide-react";
+import { Gift, User, Star, Trophy, ChevronRight, Award, MapPin } from "lucide-react";
 import { useProfile } from "@/hooks/useProfile";
 
 const MorePage = () => {
@@ -9,9 +9,7 @@ const MorePage = () => {
   const menuItems = [
     { icon: Award, label: "Recompensas", desc: "Canjea puntos por premios", path: "/recompensas", color: "text-primary" },
     { icon: Gift, label: "Sorteos", desc: "Participa y gana premios", path: "/sorteos", color: "text-neon-pink" },
-    { icon: Bell, label: "Alertas TCG", desc: "Reposiciones y lanzamientos", path: "/tcg", color: "text-neon-green" },
     { icon: User, label: "Mi Perfil", desc: "Datos, niveles y logros", path: "/perfil", color: "text-foreground" },
-    { icon: Clock, label: "Historial", desc: "Tu actividad cronológica", path: "/historial", color: "text-neon-cyan" },
     { icon: MapPin, label: "Contacto", desc: "Dirección, horario y WhatsApp", path: "/contacto", color: "text-neon-orange" },
   ];
 
