@@ -1,144 +1,245 @@
 
-# Eventos funcionales + Pagos con Stripe
+
+# PDR FrikiQuest -- Plan de Implementacion MVP
 
 ## Resumen
 
-Actualmente los botones "Inscribirme" y "Reservar" no hacen nada porque son datos mock sin conexion a base de datos. Este plan conecta todo con el backend y anade pagos reales con Stripe para eventos de pago.
+Este plan aborda las 5 epicas del PDR para cerrar el loop completo: Ticket -> Puntos -> Recompensa -> Cupon -> Validacion. Se priorizan los arreglos visibles (chat roto, recompensas vacias) y la funcionalidad minima vendible.
+
+**Nota:** Pagos quedan fuera de alcance segun el PDR. Las inscripciones a eventos y reservas se registran sin cobro online.
 
 ---
 
-## 1. Crear tablas en la base de datos
+## Estado actual detectado
 
-Se necesitan dos tablas nuevas:
+| Area | Estado |
+|---|---|
+| Chat | Tiene respuestas por reglas pero los chips de accion NO navegan (sin onClick). No hay "Escribiendo...", ni retry, ni feedback de error |
+| Recompensas | Backend completo (tabla rewards, RPC redeem_reward, hook useRewards) pero **0 recompensas en la base de datos** |
+| Tickets | UI estatica con datos mock. Botones "Foto Ticket" y "Escanear QR" no hacen nada |
+| Eventos | Datos mock hardcodeados. Boton "Inscribirme" sin onClick |
+| Reservas | Datos mock. Boton "Reservar" sin onClick |
+| Historial | Solo muestra canjes de recompensas, no hay ledger de puntos |
+| Estados globales | No existen componentes reutilizables de skeleton/empty/error |
 
-**`events`** - Eventos creados por el admin
-- id, title, date, time, location, category, price (nullable), max_spots, image_url, created_at
+---
 
-**`event_registrations`** - Inscripciones de usuarios
-- id, event_id, user_id, status (pendiente/confirmada/cancelada), payment_intent_id (nullable), created_at
+## EPICA 1 -- Chat funcional
+
+### 1.1 Envio de mensajes con feedback
+
+Archivo: `src/pages/ChatbotPage.tsx`
+
+- Anadir indicador "Escribiendo..." mientras el bot procesa
+- Mostrar estado de error con boton "Reintentar" si falla
+- Prevenir doble envio (deshabilitar boton mientras procesa)
+- Mantener autoscroll existente (ya funciona)
+
+### 1.2 Chips de accion funcionales
+
+Archivo: `src/pages/ChatbotPage.tsx`
+
+- Anadir `onClick={() => navigate(a.path)}` a los botones de accion rapida
+- Rutas validas: `/perfil`, `/reservas`, `/eventos`, `/sorteos`
+- Usar `useNavigate` de react-router-dom
+
+### 1.3 Bot fallback mejorado
+
+Archivo: `src/pages/ChatbotPage.tsx`
+
+- Ampliar diccionario de intents con mas keywords: contacto, cupon, nivel, ayuda, tienda
+- Cuando no entiende: mostrar chips de sugerencia ("Ver puntos", "Eventos", "Contactar tienda")
+- Respuesta por defecto incluye opcion de contacto directo
+
+---
+
+## EPICA 2 -- Recompensas con contenido
+
+### 2.1 Seed de recompensas demo
+
+Insertar 6 recompensas de ejemplo en la tabla `rewards` via herramienta de datos:
+
+| Nombre | Puntos | Tipo | Tags |
+|---|---|---|---|
+| 10% Descuento en compra | 200 | discount | Popular |
+| Funda Dragon Shield gratis | 500 | product | Nuevo |
+| Dado D20 metalico exclusivo | 750 | product | Exclusivo |
+| Entrada gratis torneo TCG | 300 | event | Popular |
+| 20% Descuento en figuras | 1000 | discount | Limitado |
+| Pack Booster TCG sorpresa | 1500 | product | Exclusivo |
+
+### 2.2 Empty state mejorado
+
+Archivo: `src/pages/RecompensasPage.tsx`
+
+- El empty state ya existe pero se mejorara con un CTA "Como funciona" que explique el sistema de puntos
+- Si el usuario es admin (verificar via user_roles), mostrar CTA "Crear recompensa" que navega a `/admin/recompensas`
+
+### 2.3 Canje (ya funciona)
+
+El flujo de canje ya esta implementado correctamente:
+- Validacion de puntos
+- Modal de confirmacion
+- RPC `redeem_reward` atomico
+- Generacion de cupon
+
+No requiere cambios.
+
+---
+
+## EPICA 3 -- Puntos con transparencia (Ledger)
+
+### 3.1 Crear tabla points_ledger
+
+Nueva tabla en base de datos:
+
+```text
+points_ledger
+- id (UUID, PK)
+- user_id (UUID, NOT NULL)
+- delta (INTEGER, NOT NULL) -- positivo o negativo
+- type (TEXT) -- "ticket_approved", "reward_redeemed", "manual_adjustment"
+- ref_id (UUID, nullable) -- referencia a ticket o recompensa
+- note (TEXT, nullable)
+- created_at (TIMESTAMPTZ)
+```
 
 Politicas RLS:
-- Cualquier usuario autenticado puede ver eventos
-- Usuarios pueden ver sus propias inscripciones
-- Usuarios pueden crear inscripciones propias
-- Admins pueden gestionar todo
+- Usuarios ven sus propios movimientos
+- Admins ven todos
+
+### 3.2 Pantalla Historial mejorada
+
+Archivo: `src/pages/HistorialPage.tsx`
+
+- Reemplazar la vista actual (solo canjes) por el ledger completo
+- Mostrar saldo actual arriba
+- Lista cronologica con icono segun tipo (ticket verde +, canje rojo -)
+- Cada movimiento muestra delta, tipo, fecha y nota
 
 ---
 
-## 2. Integrar Stripe para pagos
+## EPICA 4 -- Tickets funcionales
 
-Se habilitara Stripe para procesar pagos de eventos con precio.
+### 4.1 Crear tabla tickets
 
-**Flujo de pago:**
-1. Usuario pulsa "Inscribirme" en evento de pago
-2. Se abre un dialogo de confirmacion mostrando el precio
-3. Se crea un Payment Intent via edge function
-4. Se muestra formulario de tarjeta embebido (Stripe Elements)
-5. Al confirmar pago, se crea la inscripcion automaticamente
+Nueva tabla en base de datos:
 
-**Para eventos gratuitos:**
-1. Usuario pulsa "Inscribirme"
-2. Dialogo de confirmacion simple
-3. Se crea la inscripcion directamente sin pago
+```text
+tickets
+- id (UUID, PK)
+- user_id (UUID, NOT NULL)
+- status (TEXT) -- "pending", "approved", "rejected"
+- total_amount (NUMERIC, nullable)
+- points_awarded (INTEGER, default 0)
+- image_url (TEXT, nullable)
+- rejection_reason (TEXT, nullable)
+- created_at (TIMESTAMPTZ)
+- reviewed_at (TIMESTAMPTZ, nullable)
+```
+
+Politicas RLS:
+- Usuarios pueden crear e insertar sus propios tickets
+- Usuarios ven sus propios tickets
+- Admins ven y actualizan todos
+
+### 4.2 Storage bucket para imagenes de tickets
+
+Crear bucket `ticket-images` para subir fotos de tickets.
+
+### 4.3 Flujo de envio
+
+Archivo: `src/pages/TicketsPage.tsx`
+
+- Boton "Foto Ticket": abrir selector de archivo (accept="image/*" capture="environment")
+- Preview de la imagen antes de enviar
+- Boton "Confirmar envio" que sube imagen al storage y crea registro en tickets
+- Mostrar confirmacion con ID y estado "Pendiente"
+- Reemplazar datos mock por consulta real a la tabla tickets
+
+### 4.4 Detalle de ticket
+
+Archivo: `src/pages/TicketsPage.tsx`
+
+- Al pulsar un ticket, mostrar dialogo con detalle
+- Si rechazado: mostrar motivo y CTA "Reenviar"
+- Si aprobado: mostrar puntos generados
+- Si pendiente: mostrar "En revision"
 
 ---
 
-## 3. Actualizar pagina de Eventos
+## EPICA 5 -- Estados globales
 
-Cambios en `EventosPage.tsx`:
-- Cargar eventos desde la base de datos en lugar de mock data
-- Boton "Inscribirme" funcional con dialogo de confirmacion
-- Para eventos con precio: mostrar formulario de pago Stripe
-- Para eventos gratis: inscripcion directa
-- Mostrar plazas disponibles en tiempo real
-- Cambiar estado a "Inscrito" tras inscripcion exitosa
-- Boton "Completo" cuando no hay plazas
+### 5.1 Componentes reutilizables
 
----
+Crear 3 componentes nuevos:
 
-## 4. Actualizar pagina de Reservas
+**`src/components/StateEmpty.tsx`**
+- Icono, titulo, subtitulo, CTA opcional
+- Reutilizable en todas las listas vacias
 
-Cambios en `ReservasPage.tsx`:
-- Boton "Reservar" funcional con dialogo de confirmacion
-- Crear registro de reserva en la base de datos
-- Feedback visual con toast de exito
+**`src/components/StateError.tsx`**
+- Mensaje de error con boton "Reintentar"
+- Acepta onRetry callback
 
-*(Las reservas no requieren pago, solo registro)*
+**`src/components/StateSkeleton.tsx`**
+- Skeleton de tarjeta animada
+- Configurable por numero de items
 
----
+### 5.2 Aplicar en todas las paginas
 
-## 5. Verificar enlaces de HomePage
-
-Revisar que los botones "Inscribirme" y "Participar" en la pagina de inicio navegan correctamente a las paginas correspondientes.
+Actualizar las siguientes paginas para usar los componentes globales:
+- TicketsPage (loading, empty, error)
+- RecompensasPage (ya tiene parcialmente)
+- EventosPage (loading, empty, error)
+- ReservasPage (loading, empty, error)
+- HistorialPage (ya tiene parcialmente)
 
 ---
 
 ## Detalles tecnicos
 
-### Migracion de base de datos:
+### Migraciones de base de datos (2 migraciones):
 
-```sql
-CREATE TABLE public.events (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  title TEXT NOT NULL,
-  date DATE NOT NULL,
-  time TIME NOT NULL,
-  location TEXT NOT NULL,
-  category TEXT NOT NULL DEFAULT 'Evento',
-  price NUMERIC(10,2),
-  max_spots INTEGER NOT NULL DEFAULT 16,
-  image_url TEXT,
-  description TEXT,
-  active BOOLEAN NOT NULL DEFAULT true,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
-);
+**Migracion 1: tickets + storage**
+- Crear tabla `tickets` con RLS
+- Crear bucket `ticket-images` con politica de upload para usuarios autenticados
 
-CREATE TABLE public.event_registrations (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  event_id UUID NOT NULL REFERENCES public.events(id),
-  user_id UUID NOT NULL,
-  status TEXT NOT NULL DEFAULT 'confirmada',
-  payment_intent_id TEXT,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-  UNIQUE(event_id, user_id)
-);
+**Migracion 2: points_ledger**
+- Crear tabla `points_ledger` con RLS
+- Crear trigger opcional: al aprobar ticket, insertar en ledger automaticamente
 
-ALTER TABLE public.events ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.event_registrations ENABLE ROW LEVEL SECURITY;
+### Archivos a crear:
 
--- Policies
-CREATE POLICY "Authenticated can view events"
-  ON public.events FOR SELECT USING (auth.uid() IS NOT NULL);
-CREATE POLICY "Admins can manage events"
-  ON public.events FOR ALL USING (has_role(auth.uid(), 'admin'));
-CREATE POLICY "Users can view own registrations"
-  ON public.event_registrations FOR SELECT USING (auth.uid() = user_id);
-CREATE POLICY "Users can register"
-  ON public.event_registrations FOR INSERT WITH CHECK (auth.uid() = user_id);
-CREATE POLICY "Admins can manage registrations"
-  ON public.event_registrations FOR ALL USING (has_role(auth.uid(), 'admin'));
-```
+| Archivo | Descripcion |
+|---|---|
+| `src/components/StateEmpty.tsx` | Componente empty state reutilizable |
+| `src/components/StateError.tsx` | Componente error state reutilizable |
+| `src/components/StateSkeleton.tsx` | Componente skeleton reutilizable |
+| `src/hooks/useTickets.ts` | Hook para CRUD de tickets |
+| `src/hooks/usePointsLedger.ts` | Hook para leer ledger de puntos |
 
-### Edge function para pagos:
-
-- `create-event-payment` - Crea un Stripe Payment Intent y devuelve el client_secret
-- Valida que el evento existe, tiene precio, y hay plazas
-- Tras pago exitoso, crea la inscripcion
-
-### Archivos a modificar/crear:
+### Archivos a modificar:
 
 | Archivo | Cambio |
 |---|---|
-| `src/pages/EventosPage.tsx` | Cargar datos reales, dialogo inscripcion, integracion Stripe Elements |
-| `src/pages/ReservasPage.tsx` | Boton "Reservar" funcional con confirmacion |
-| `src/pages/HomePage.tsx` | Verificar que enlaces funcionan correctamente |
-| `supabase/functions/create-event-payment/index.ts` | **Nuevo** - Edge function para Payment Intent |
+| `src/pages/ChatbotPage.tsx` | Chips navegables, typing indicator, retry, mas intents |
+| `src/pages/TicketsPage.tsx` | Reescribir con datos reales, upload de imagen, detalle |
+| `src/pages/HistorialPage.tsx` | Mostrar ledger completo en vez de solo canjes |
+| `src/pages/RecompensasPage.tsx` | Empty state mejorado con CTAs |
+| `src/pages/EventosPage.tsx` | Aplicar estados globales (datos siguen mock por ahora) |
+| `src/pages/ReservasPage.tsx` | Aplicar estados globales (datos siguen mock por ahora) |
 
-### Dependencias nuevas:
+### Insercion de datos:
 
-- `@stripe/stripe-js` - SDK de Stripe para frontend
-- `@stripe/react-stripe-js` - Componentes React de Stripe
+- 6 recompensas seed en tabla `rewards`
 
-### Prerequisito:
+### Orden de implementacion sugerido:
 
-- Habilitar Stripe en el proyecto (se pedira la clave secreta de Stripe)
+1. Componentes de estado globales (base para todo lo demas)
+2. Chat: chips + typing + retry + intents
+3. Seed de recompensas + empty state mejorado
+4. Migracion tickets + storage + flujo de envio
+5. Migracion ledger + pantalla historial mejorada
+6. Aplicar estados globales en todas las paginas
+
