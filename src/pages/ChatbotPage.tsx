@@ -1,56 +1,151 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Send, Bot, User, ShoppingBag, Calendar, Gift, Star, Phone, Loader2 } from "lucide-react";
+import { Send, Bot, User, ShoppingBag, Calendar, Gift, Star, Phone, Loader2, Receipt, MapPin, MessageCircle, HelpCircle, AlertCircle, RefreshCw } from "lucide-react";
+
+/* ── Types ── */
+type QuickAction = {
+  label: string;
+  icon: typeof Star;
+  path?: string;
+  href?: string; // for external links (tel:, whatsapp)
+};
 
 type Message = {
   id: number;
   role: "bot" | "user";
   text: string;
-  actions?: { label: string; icon: typeof Star; path: string }[];
+  actions?: QuickAction[];
+  isError?: boolean;
 };
 
+type Intent =
+  | "greeting"
+  | "help"
+  | "points"
+  | "tickets"
+  | "rewards"
+  | "reservations"
+  | "events"
+  | "contact"
+  | "fallback";
+
+/* ── Intent detection ── */
+const normalize = (text: string): string =>
+  text
+    .toLowerCase()
+    .trim()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "") // remove accents
+    .replace(/[^\w\s]/g, " ") // remove punctuation
+    .replace(/\s+/g, " ")
+    .trim();
+
+const intentKeywords: { intent: Intent; keywords: string[] }[] = [
+  { intent: "contact", keywords: ["contacto", "whatsapp", "telefono", "llamar", "direccion", "horario"] },
+  { intent: "tickets", keywords: ["ticket", "enviar ticket", "subir ticket", "qr", "escanear", "compra"] },
+  { intent: "rewards", keywords: ["canjear", "recompensa", "premio", "cupon", "cupones", "descuento"] },
+  { intent: "points", keywords: ["punto", "saldo", "nivel", "mis puntos"] },
+  { intent: "events", keywords: ["evento", "torneo", "inscribirme", "inscripcion", "quedada"] },
+  { intent: "reservations", keywords: ["reservar", "reserva", "figura", "preorder", "encargar", "manga"] },
+  { intent: "help", keywords: ["ayuda", "opciones", "que puedes hacer", "menu", "como funciona"] },
+  { intent: "greeting", keywords: ["hola", "buenas", "hey", "hello", "holaa", "buenos dias", "buenas tardes", "buenas noches", "hi", "saludos", "que tal"] },
+];
+
+const detectIntent = (text: string): Intent => {
+  const norm = normalize(text);
+  if (!norm) return "fallback";
+
+  for (const { intent, keywords } of intentKeywords) {
+    for (const kw of keywords) {
+      if (norm.includes(kw)) {
+        console.log(`[Chatbot] Intent: ${intent} | keyword: "${kw}" | input: "${text}"`);
+        return intent;
+      }
+    }
+  }
+
+  console.log(`[Chatbot] Intent: fallback | input: "${text}"`);
+  return "fallback";
+};
+
+/* ── Quick action presets ── */
+const coreChips: QuickAction[] = [
+  { label: "Ver puntos", icon: Star, path: "/perfil" },
+  { label: "Enviar ticket", icon: Receipt, path: "/tickets" },
+  { label: "Recompensas", icon: Gift, path: "/recompensas" },
+  { label: "Reservar", icon: ShoppingBag, path: "/reservas" },
+  { label: "Ver eventos", icon: Calendar, path: "/eventos" },
+  { label: "Contactar tienda", icon: Phone, path: "/contacto" },
+];
+
+const contactChips: QuickAction[] = [
+  { label: "Contacto", icon: Phone, path: "/contacto" },
+  { label: "WhatsApp", icon: MessageCircle, path: "/contacto" },
+  { label: "Dirección", icon: MapPin, path: "/contacto" },
+];
+
+/* ── Responses per intent ── */
+const intentResponses: Record<Intent, { text: string; actions: QuickAction[] }> = {
+  greeting: {
+    text: "¡Hola! 👋 ¿Qué quieres hacer hoy? Puedo ayudarte con puntos, tickets, recompensas, reservas y eventos.",
+    actions: coreChips,
+  },
+  help: {
+    text: "🤝 Puedo ayudarte con: puntos, tickets, recompensas, reservas y eventos. Elige una opción:",
+    actions: coreChips,
+  },
+  points: {
+    text: "⭐ Aquí tienes tus puntos. ¿Quieres ver el historial?",
+    actions: [
+      { label: "Ver puntos", icon: Star, path: "/perfil" },
+      { label: "Enviar ticket", icon: Receipt, path: "/tickets" },
+    ],
+  },
+  tickets: {
+    text: "🧾 Puedes subir un ticket con foto o QR. Te aviso cuando esté revisado.",
+    actions: [
+      { label: "Enviar ticket", icon: Receipt, path: "/tickets" },
+    ],
+  },
+  rewards: {
+    text: "🎁 Aquí puedes canjear tus puntos por premios y ver tus cupones.",
+    actions: [
+      { label: "Ir a recompensas", icon: Gift, path: "/recompensas" },
+    ],
+  },
+  reservations: {
+    text: "📦 Vamos a reservas. ¿Qué quieres reservar?",
+    actions: [
+      { label: "Ver reservas", icon: ShoppingBag, path: "/reservas" },
+    ],
+  },
+  events: {
+    text: "📅 Aquí están los próximos eventos. Puedes inscribirte desde la lista.",
+    actions: [
+      { label: "Ver eventos", icon: Calendar, path: "/eventos" },
+    ],
+  },
+  contact: {
+    text: "📞 Te paso las opciones para contactar con la tienda:",
+    actions: contactChips,
+  },
+  fallback: {
+    text: "Aún no tengo esa información en el chat 😅 ¿Te refieres a puntos, tickets, recompensas, reservas o eventos?",
+    actions: coreChips,
+  },
+};
+
+/* ── Initial message ── */
 const initialMessages: Message[] = [
   {
     id: 1,
     role: "bot",
-    text: "¡Hola! 👋 Soy el asistente de la tienda. ¿En qué puedo ayudarte?",
-    actions: [
-      { label: "Ver mis puntos", icon: Star, path: "/perfil" },
-      { label: "Reservar figura", icon: ShoppingBag, path: "/reservas" },
-      { label: "Ver eventos", icon: Calendar, path: "/eventos" },
-      { label: "Mis sorteos", icon: Gift, path: "/sorteos" },
-    ],
+    text: "¡Hola! 👋 ¿Qué quieres hacer hoy? Puedo ayudarte con puntos, tickets, recompensas, reservas y eventos.",
+    actions: coreChips,
   },
 ];
 
-const botResponses: Record<string, string> = {
-  horario: "🕐 Nuestro horario es:\nLunes a Viernes: 10:00 – 20:00\nSábados: 10:00 – 14:00 y 17:00 – 20:00\nDomingos: Cerrado",
-  puntos: "⭐ Puedes ver tu saldo y movimientos en la sección de Perfil. ¡Cada compra suma puntos!",
-  reserva: "📦 Para reservar una figura, ve a la sección Reservas y elige el producto. También puedes pedir info aquí sobre cualquier figura.",
-  eventos: "📅 Consulta los próximos eventos en la sección Eventos. Hay torneos, lanzamientos y quedadas.",
-  devolucion: "🔄 Aceptamos devoluciones en 15 días con ticket original y producto sin abrir. Para TCG sellado, 7 días.",
-  stock: "📋 No tengo esa info en este momento. Te sugiero reservar para ser el primero cuando llegue, o pregunta directamente en tienda.",
-  contacto: "📞 Puedes contactar con la tienda por WhatsApp o llamando directamente. ¡Estaremos encantados de ayudarte!",
-  cupon: "🎟️ Los cupones se generan al canjear recompensas. Ve a Recompensas para ver el catálogo y canjear tus puntos.",
-  nivel: "🏆 Tu nivel sube automáticamente al acumular puntos. Cada nivel desbloquea beneficios exclusivos.",
-  ayuda: "🤝 Puedo ayudarte con: puntos, reservas, eventos, devoluciones, cupones y más. ¡Pregúntame!",
-  tienda: "🏪 Somos tu tienda friki de confianza. Manga, figuras, TCG, Warhammer y mucho más.",
-  ticket: "🧾 Para subir un ticket de compra, ve a la sección Tickets y saca una foto. ¡Ganarás puntos automáticamente!",
-  sorteo: "🎉 Los sorteos activos están en la sección Sorteos. Participa con tus puntos para ganar premios exclusivos.",
-  recompensa: "🎁 En la sección Recompensas puedes canjear tus puntos por descuentos, productos y más.",
-  manga: "📚 Tenemos las últimas novedades en manga. Si buscas algo en concreto, ¡pregunta en tienda o haz una reserva!",
-  figura: "🗿 Consulta las figuras disponibles en Reservas. Si no ves la que buscas, podemos encargarla.",
-  warhammer: "⚔️ Tenemos miniaturas, pinturas y eventos de Warhammer. ¡Mira los próximos eventos!",
-  pokemon: "⚡ Cartas Pokémon, boosters y torneos semanales. ¡Consulta los próximos torneos en Eventos!",
-  direccion: "📍 Encuéntranos en la sección Contacto para ver nuestra dirección y cómo llegar.",
-};
-
-const fallbackActions = [
-  { label: "Ver puntos", icon: Star, path: "/perfil" },
-  { label: "Eventos", icon: Calendar, path: "/eventos" },
-  { label: "Contactar tienda", icon: Phone, path: "/contacto" },
-];
-
+/* ── Component ── */
 const ChatbotPage = () => {
   const navigate = useNavigate();
   const [messages, setMessages] = useState<Message[]>(initialMessages);
@@ -62,35 +157,61 @@ const ChatbotPage = () => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [messages, isTyping]);
 
-  const handleSend = () => {
-    if (!input.trim() || isTyping) return;
-    const userMsg: Message = { id: Date.now(), role: "user", text: input.trim() };
+  const handleAction = (action: QuickAction) => {
+    if (action.href) {
+      window.open(action.href, "_blank", "noopener");
+    } else if (action.path) {
+      navigate(action.path);
+    }
+  };
+
+  const processMessage = (text: string) => {
+    try {
+      const intent = detectIntent(text);
+      const response = intentResponses[intent];
+      const botMsg: Message = {
+        id: Date.now() + 1,
+        role: "bot",
+        text: response.text,
+        actions: response.actions,
+      };
+      setMessages((prev) => [...prev, botMsg]);
+    } catch (err) {
+      console.error("[Chatbot] Error processing message:", err);
+      const errorMsg: Message = {
+        id: Date.now() + 1,
+        role: "bot",
+        text: "⚠️ Ha ocurrido un error. Pulsa Reintentar o elige una opción.",
+        actions: coreChips,
+        isError: true,
+      };
+      setMessages((prev) => [...prev, errorMsg]);
+    } finally {
+      setIsTyping(false);
+    }
+  };
+
+  const handleSend = (text?: string) => {
+    const value = text ?? input;
+    if (!value.trim() || isTyping) return;
+
+    const userMsg: Message = { id: Date.now(), role: "user", text: value.trim() };
     setMessages((prev) => [...prev, userMsg]);
-    const query = input;
-    setInput("");
+    const query = value;
+    if (!text) setInput("");
     setIsTyping(true);
 
-    setTimeout(() => {
-      const lower = query.toLowerCase();
-      let response = "";
-      let actions: Message["actions"] = undefined;
+    setTimeout(() => processMessage(query), 500 + Math.random() * 300);
+  };
 
-      for (const [key, val] of Object.entries(botResponses)) {
-        if (lower.includes(key)) {
-          response = val;
-          break;
-        }
-      }
-
-      if (!response) {
-        response = "🤔 No tengo esa info ahora. ¿Quizás te interese algo de esto?";
-        actions = fallbackActions;
-      }
-
-      const botMsg: Message = { id: Date.now() + 1, role: "bot", text: response, actions };
-      setMessages((prev) => [...prev, botMsg]);
-      setIsTyping(false);
-    }, 600 + Math.random() * 400);
+  const handleRetry = () => {
+    // Find last user message and retry
+    const lastUser = [...messages].reverse().find((m) => m.role === "user");
+    if (lastUser) {
+      // Remove last error message
+      setMessages((prev) => prev.filter((m) => !m.isError || m.id !== prev[prev.length - 1]?.id));
+      handleSend(lastUser.text);
+    }
   };
 
   return (
@@ -108,25 +229,42 @@ const ChatbotPage = () => {
         {messages.map((msg) => (
           <div key={msg.id} className={`flex gap-2 ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
             {msg.role === "bot" && (
-              <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-1">
-                <Bot className="w-4 h-4 text-primary" />
+              <div className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 mt-1 ${msg.isError ? "bg-destructive/10" : "bg-primary/10"}`}>
+                {msg.isError ? (
+                  <AlertCircle className="w-4 h-4 text-destructive" />
+                ) : (
+                  <Bot className="w-4 h-4 text-primary" />
+                )}
               </div>
             )}
             <div className={`max-w-[80%] space-y-2 ${msg.role === "user" ? "items-end" : ""}`}>
-              <div className={`rounded-2xl px-3.5 py-2.5 text-sm whitespace-pre-line ${
-                msg.role === "user"
-                  ? "bg-primary text-primary-foreground rounded-br-md"
-                  : "bg-card border border-border/50 rounded-bl-md"
-              }`}>
+              <div
+                className={`rounded-2xl px-3.5 py-2.5 text-sm whitespace-pre-line ${
+                  msg.role === "user"
+                    ? "bg-primary text-primary-foreground rounded-br-md"
+                    : msg.isError
+                      ? "bg-destructive/5 border border-destructive/20 rounded-bl-md"
+                      : "bg-card border border-border/50 rounded-bl-md"
+                }`}
+              >
                 {msg.text}
               </div>
-              {msg.actions && (
+              {msg.isError && (
+                <button
+                  onClick={handleRetry}
+                  className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-destructive/10 text-destructive text-xs hover:bg-destructive/20 transition-colors"
+                >
+                  <RefreshCw className="w-3 h-3" />
+                  Reintentar
+                </button>
+              )}
+              {msg.actions && !msg.isError && (
                 <div className="flex flex-wrap gap-1.5">
                   {msg.actions.map((a) => (
                     <button
                       key={a.label}
-                      onClick={() => navigate(a.path)}
-                      className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-muted text-xs hover:bg-surface-hover transition-colors"
+                      onClick={() => handleAction(a)}
+                      className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-muted text-xs hover:bg-accent active:scale-95 transition-all"
                     >
                       <a.icon className="w-3 h-3 text-primary" />
                       {a.label}
@@ -166,7 +304,7 @@ const ChatbotPage = () => {
             className="flex-1 bg-muted rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground"
           />
           <button
-            onClick={handleSend}
+            onClick={() => handleSend()}
             disabled={isTyping || !input.trim()}
             className="w-10 h-10 rounded-xl bg-primary text-primary-foreground flex items-center justify-center hover:opacity-90 transition-opacity disabled:opacity-50"
           >
