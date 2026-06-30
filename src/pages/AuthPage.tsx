@@ -15,7 +15,7 @@ import {
   UserRound,
 } from "lucide-react";
 import landingBackground from "@/assets/frikiquest-landing-bg.webp";
-import frikiQuestLogo from "@/assets/logo-friki-quest.webp";
+import frikiQuestLogo from "@/assets/logo-friki-quest.png";
 
 type AuthMode = "landing" | "login" | "signup";
 
