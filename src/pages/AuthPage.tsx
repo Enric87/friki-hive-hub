@@ -11,11 +11,11 @@ import {
 } from "lucide-react";
 import landingBackground from "@/assets/frikiquest-landing-bg.webp";
 import frikiQuestLogo from "@/assets/logo-friki-quest.png";
-import alertTcgIcon from "@/assets/landing-icons/alerta-tcg.webp";
-import pointsIcon from "@/assets/landing-icons/gana-puntos.webp";
-import rewardsIcon from "@/assets/landing-icons/canjea-recompensas.webp";
-import ticketsIcon from "@/assets/landing-icons/escanea-tickets.webp";
-import eventsIcon from "@/assets/landing-icons/eventos-reservas.webp";
+import alertTcgIcon from "@/assets/home-icons/alerta-tcg.png";
+import pointsIcon from "@/assets/home-icons/gana-puntos.png";
+import rewardsIcon from "@/assets/home-icons/canjea-recompensas.png";
+import ticketsIcon from "@/assets/home-icons/escanea-tickets.png";
+import eventsIcon from "@/assets/home-icons/eventos-reservas.png";
 
 type AuthMode = "landing" | "login" | "signup";
 
@@ -101,12 +101,12 @@ const AuthPage = () => {
 
           <div className="mt-8 grid w-full grid-cols-5 divide-x divide-white/15">
             {features.map(({ image, line1, line2 }) => (
-              <div key={line1} className="flex min-w-0 flex-col items-center gap-2 px-1">
+              <div key={line1} className="flex min-w-0 flex-col items-center gap-2 px-0.5">
                 <img
                   src={image}
                   alt=""
                   aria-hidden="true"
-                  className="h-12 w-12 rounded-xl object-cover shadow-lg"
+                  className="h-14 w-14 object-contain"
                 />
                 <span className="text-[11px] font-semibold leading-tight text-slate-100 text-center">{line1}<br />{line2}</span>
               </div>

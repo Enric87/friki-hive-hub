@@ -1,15 +1,18 @@
-import { Bell, Calendar, ChevronRight, Gift, QrCode, Receipt, ShoppingBag, Star } from "lucide-react";
+import { Bell, Calendar, ChevronRight, ShoppingBag, Star } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useLevels, useProfile } from "@/hooks/useProfile";
 import { useStore } from "@/contexts/StoreContext";
 import pokemonEvent from "@/assets/eventos/torneo-pokemon.jpg";
 import gojoFigure from "@/assets/reservas/gojo-hollow-purple.jpg";
 import pokemonBooster from "@/assets/reservas/pokemon-sv8-booster.jpg";
+import rewardsIcon from "@/assets/home-icons/canjea-recompensas.png";
+import ticketsIcon from "@/assets/home-icons/escanea-tickets.png";
+import eventsIcon from "@/assets/home-icons/eventos-reservas.png";
 
 const quickActions = [
-  { icon: Receipt, label: "Subir ticket", path: "/tickets", tone: "cyan" },
-  { icon: QrCode, label: "Escanear QR", path: "/tickets", tone: "blue" },
-  { icon: Gift, label: "Canjear puntos", path: "/recompensas", tone: "pink" },
+  { image: ticketsIcon, label: "Subir ticket", path: "/tickets" },
+  { image: eventsIcon, label: "Eventos y reservas", path: "/eventos" },
+  { image: rewardsIcon, label: "Canjear puntos", path: "/recompensas" },
 ];
 
 const HomePage = () => {
@@ -79,19 +82,13 @@ const HomePage = () => {
       <section>
         <h2 className="mb-3 text-sm font-black">Acciones rapidas</h2>
         <div className="grid grid-cols-3 gap-3">
-          {quickActions.map(({ icon: Icon, label, path, tone }) => (
+          {quickActions.map(({ image, label, path }) => (
             <button
               key={label}
               onClick={() => navigate(path)}
-              className={`flex min-h-[96px] flex-col items-center justify-center gap-2 rounded-xl border p-3 text-center transition-transform active:scale-95 ${
-                tone === "cyan"
-                  ? "border-cyan-300/45 bg-cyan-500/10 text-cyan-200 shadow-[0_0_24px_rgba(34,211,238,0.18)]"
-                  : tone === "blue"
-                    ? "border-blue-400/35 bg-blue-600/10 text-sky-200 shadow-[0_0_24px_rgba(59,130,246,0.16)]"
-                    : "border-pink-400/45 bg-pink-500/10 text-pink-200 shadow-[0_0_24px_rgba(236,72,153,0.18)]"
-              }`}
+              className="flex min-h-[108px] flex-col items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.035] p-2 text-center shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_0_24px_rgba(168,85,247,0.12)] transition-transform active:scale-95"
             >
-              <Icon className="h-8 w-8" />
+              <img src={image} alt="" aria-hidden="true" className="h-14 w-14 object-contain" />
               <span className="text-xs font-black leading-tight">{label}</span>
             </button>
           ))}
