@@ -1,22 +1,15 @@
-import { Receipt, ShoppingBag, Calendar, Gift, Star, Trophy, TrendingUp, CheckCircle, Award } from "lucide-react";
+import { Bell, Calendar, ChevronRight, Gift, QrCode, Receipt, ShoppingBag, Star } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useLevels, useProfile } from "@/hooks/useProfile";
 import { useStore } from "@/contexts/StoreContext";
+import pokemonEvent from "@/assets/eventos/torneo-pokemon.jpg";
+import gojoFigure from "@/assets/reservas/gojo-hollow-purple.jpg";
+import pokemonBooster from "@/assets/reservas/pokemon-sv8-booster.jpg";
 
 const quickActions = [
-  { icon: Receipt, label: "Enviar Ticket", path: "/tickets", color: "text-primary" },
-  { icon: ShoppingBag, label: "Reservar", path: "/reservas", color: "text-neon-orange" },
-  { icon: Calendar, label: "Eventos", path: "/eventos", color: "text-neon-purple" },
-];
-
-const mockEvents = [
-  { id: 1, title: "Torneo Pokémon TCG", date: "15 Feb", spots: 4, category: "TCG" },
-  { id: 2, title: "Lanzamiento One Piece OP-10", date: "20 Feb", spots: 12, category: "Lanzamiento" },
-  { id: 3, title: "Quedada Warhammer", date: "22 Feb", spots: 8, category: "Evento" },
-];
-
-const mockGiveaways = [
-  { id: 1, title: "Booster Box Pokémon SV7", endDate: "28 Feb", entries: 42 },
+  { icon: Receipt, label: "Subir ticket", path: "/tickets", tone: "cyan" },
+  { icon: QrCode, label: "Escanear QR", path: "/tickets", tone: "blue" },
+  { icon: Gift, label: "Canjear puntos", path: "/recompensas", tone: "pink" },
 ];
 
 const HomePage = () => {
@@ -30,175 +23,129 @@ const HomePage = () => {
   const nextLevel = levels?.find((level) => level.min_points > currentPoints);
   const currentLevel = currentLevelData?.name ?? profile?.level ?? "Novato";
   const progressBase = currentLevelData?.min_points ?? 0;
+  const nextTarget = nextLevel?.min_points ?? Math.max(currentPoints, 500);
   const progressPercent = nextLevel
     ? ((currentPoints - progressBase) / (nextLevel.min_points - progressBase)) * 100
     : 100;
 
-  return (
-    <div className="px-4 pt-6 pb-4 max-w-lg mx-auto space-y-6 animate-fade-in">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-sm text-muted-foreground">Bienvenido de nuevo</p>
-          <h1 className="text-2xl font-bold text-gradient-neon text-display">{config.store_name}</h1>
-        </div>
-        <button
-          onClick={() => navigate("/perfil")}
-          className="w-10 h-10 rounded-full bg-card flex items-center justify-center border border-border"
-        >
-          <Star className="w-5 h-5 text-primary" />
-        </button>
-      </div>
+  const userName = profile?.display_name?.split(" ")[0] || "Alex";
 
-      {/* Points Card */}
-      <div className="rounded-2xl bg-card p-5 border border-border">
-        <div className="flex items-center justify-between mb-3">
-          <div>
-            <p className="text-xs text-muted-foreground text-display tracking-widest uppercase">Tus Puntos</p>
-            <p className="text-3xl font-bold text-primary text-display">{currentPoints.toLocaleString()}</p>
+  return (
+    <div className="mx-auto max-w-lg space-y-5 px-4 pb-4 pt-5 animate-fade-in">
+      <header className="flex items-center justify-between">
+        <button onClick={() => navigate("/perfil")} className="flex items-center gap-3 text-left">
+          <div className="flex h-11 w-11 items-center justify-center rounded-full border border-amber-300/50 bg-gradient-to-br from-amber-300 to-violet-600 shadow-[0_0_22px_rgba(168,85,247,0.35)]">
+            <Star className="h-5 w-5 fill-white text-white" />
           </div>
-          <div className="text-right">
-            <div className="flex items-center gap-1.5">
-              <Trophy className="w-4 h-4 text-neon-orange" />
-              <span className="text-sm font-semibold text-neon-orange text-display">{currentLevel}</span>
+          <div>
+            <p className="text-base font-black">Hola, {userName}!</p>
+            <p className="text-xs font-medium text-cyan-300">{config.store_name}</p>
+          </div>
+        </button>
+        <button className="relative flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/5">
+          <Bell className="h-5 w-5 text-white" />
+          <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-pink-500 shadow-[0_0_12px_rgba(236,72,153,0.9)]" />
+        </button>
+      </header>
+
+      <section className="app-card overflow-hidden rounded-2xl p-5">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <p className="text-[11px] font-black uppercase tracking-wide text-yellow-100">Puntos disponibles</p>
+            <div className="mt-2 flex items-end gap-2">
+              <span className="text-5xl font-black leading-none text-yellow-300 text-display">{currentPoints}</span>
+              <span className="pb-1 text-xl font-black text-yellow-200">pts</span>
             </div>
           </div>
-        </div>
-        <div className="space-y-1.5">
-          <div className="flex justify-between text-xs text-muted-foreground">
-            <span>Progreso al siguiente nivel</span>
-            {nextLevel && <span>{currentPoints}/{nextLevel.min_points}</span>}
+          <div className="flex h-20 w-20 items-center justify-center rounded-full border border-yellow-200/60 bg-yellow-300/10 shadow-[0_0_30px_rgba(250,204,21,0.45)]">
+            <Star className="h-10 w-10 fill-yellow-300 text-yellow-300" />
           </div>
-          <div className="h-2.5 bg-muted rounded-full overflow-hidden">
+        </div>
+
+        <div className="mt-5 space-y-2">
+          <div className="flex justify-between text-xs font-medium text-slate-300">
+            <span>Siguiente nivel: {nextLevel?.name ?? currentLevel}</span>
+            <span>{currentPoints} / {nextTarget} pts</span>
+          </div>
+          <div className="h-3 overflow-hidden rounded-full bg-white/10">
             <div
-              className="h-full gradient-neon rounded-full transition-all duration-500"
+              className="h-full rounded-full bg-gradient-to-r from-yellow-300 to-fuchsia-400 shadow-[0_0_18px_rgba(250,204,21,0.55)]"
               style={{ width: `${Math.min(Math.max(progressPercent, 0), 100)}%` }}
             />
           </div>
         </div>
-        <p className="text-xs text-muted-foreground mt-2">+ 1 participación en sorteos</p>
-      </div>
+      </section>
 
-      {/* Quick Actions */}
-      <div className="grid grid-cols-3 gap-3">
-        {quickActions.map(({ icon: Icon, label, path, color }) => (
-          <button
-            key={path}
-            onClick={() => navigate(path)}
-            className="relative flex flex-col items-center gap-2 p-4 rounded-2xl bg-card hover:bg-surface-hover transition-colors border border-border"
-          >
-            <div>
-              <Icon className={`w-6 h-6 ${color}`} />
-            </div>
-            <span className="text-xs text-muted-foreground leading-tight text-center">{label}</span>
-          </button>
-        ))}
-      </div>
-
-      {/* Rewards CTA */}
-      <button
-        onClick={() => navigate("/recompensas")}
-        className="w-full flex items-center gap-3 bg-card rounded-2xl p-4 border border-primary/20 hover:bg-surface-hover transition-colors"
-      >
-        <div className="w-11 h-11 rounded-xl gradient-neon flex items-center justify-center shrink-0">
-          <Award className="w-5 h-5 text-primary-foreground" />
+      <section>
+        <h2 className="mb-3 text-sm font-black">Acciones rapidas</h2>
+        <div className="grid grid-cols-3 gap-3">
+          {quickActions.map(({ icon: Icon, label, path, tone }) => (
+            <button
+              key={label}
+              onClick={() => navigate(path)}
+              className={`flex min-h-[96px] flex-col items-center justify-center gap-2 rounded-xl border p-3 text-center transition-transform active:scale-95 ${
+                tone === "cyan"
+                  ? "border-cyan-300/45 bg-cyan-500/10 text-cyan-200 shadow-[0_0_24px_rgba(34,211,238,0.18)]"
+                  : tone === "blue"
+                    ? "border-blue-400/35 bg-blue-600/10 text-sky-200 shadow-[0_0_24px_rgba(59,130,246,0.16)]"
+                    : "border-pink-400/45 bg-pink-500/10 text-pink-200 shadow-[0_0_24px_rgba(236,72,153,0.18)]"
+              }`}
+            >
+              <Icon className="h-8 w-8" />
+              <span className="text-xs font-black leading-tight">{label}</span>
+            </button>
+          ))}
         </div>
-        <div className="flex-1 text-left">
-          <p className="text-sm font-semibold">Canjea tus puntos</p>
-          <p className="text-xs text-muted-foreground">Descubre las recompensas disponibles</p>
-        </div>
-        <span className="text-xs text-primary font-medium">Ver →</span>
-      </button>
+      </section>
 
-      {/* Stats Row */}
-      <div className="grid grid-cols-3 gap-3">
-        {[
-          { label: "Cupones", value: 1, icon: Gift, color: "text-neon-orange" },
-          { label: "Reservas", value: 2, icon: ShoppingBag, color: "text-primary" },
-          { label: "Eventos", value: mockEvents.length, icon: Calendar, color: "text-neon-purple" },
-        ].map(({ label, value, icon: Icon, color }) => (
-          <div key={label} className="bg-card rounded-2xl p-4 border border-border text-center">
-            <Icon className={`w-7 h-7 mx-auto mb-1.5 ${color}`} />
-            <p className="text-2xl font-bold text-display">{value}</p>
-            <p className="text-xs text-muted-foreground">{label}</p>
+      <PreviewSection title="Proximo evento" action={() => navigate("/eventos")}>
+        <button onClick={() => navigate("/eventos")} className="app-card flex w-full items-center gap-3 rounded-xl p-3 text-left">
+          <img src={pokemonEvent} alt="" className="h-16 w-16 rounded-lg object-cover" />
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm font-black">Torneo Pokemon</p>
+            <p className="mt-1 text-xs text-slate-300">Sabado, 15 feb · 17:00</p>
+            <p className="mt-1 text-xs font-bold text-emerald-300">Quedan 8 plazas</p>
           </div>
-        ))}
-      </div>
+          <ChevronRight className="h-5 w-5 text-cyan-300" />
+        </button>
+      </PreviewSection>
 
-      {/* Upcoming Events */}
-      <section>
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="text-sm font-semibold text-display tracking-wider uppercase">Próximos Eventos</h2>
-          <button onClick={() => navigate("/eventos")} className="text-xs text-primary font-medium">Ver todos</button>
-        </div>
-        <div className="space-y-2">
-          {mockEvents.map((event) => (
-            <div key={event.id} className="flex items-center gap-3 bg-card rounded-2xl p-4 border border-border">
-              <div className="w-11 h-11 rounded-xl bg-muted flex items-center justify-center shrink-0">
-                <Calendar className="w-5 h-5 text-neon-purple" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium truncate">{event.title}</p>
-                <p className="text-xs text-muted-foreground">{event.date} · {event.spots} plazas</p>
-              </div>
-              <button
-                onClick={() => navigate("/eventos")}
-                className="shrink-0 px-3 py-1.5 rounded-full bg-primary text-primary-foreground text-xs font-medium hover:bg-primary/90 transition-colors"
-              >
-                Inscribirme
-              </button>
-            </div>
-          ))}
-        </div>
-      </section>
+      <PreviewSection title="Reservas activas" action={() => navigate("/reservas")}>
+        <button onClick={() => navigate("/reservas")} className="app-card flex w-full items-center gap-3 rounded-xl p-3 text-left">
+          <img src={gojoFigure} alt="" className="h-16 w-16 rounded-lg object-cover" />
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm font-black">Figura Gojo SSJ</p>
+            <p className="mt-1 text-xs text-slate-300">Reservada · Recogida en tienda</p>
+            <p className="mt-1 text-xs font-bold text-emerald-300">Fecha limite: 20 feb</p>
+          </div>
+          <ShoppingBag className="h-5 w-5 text-violet-300" />
+        </button>
+      </PreviewSection>
 
-      {/* Active Giveaway */}
-      {mockGiveaways.length > 0 && (
-        <section>
-          <h2 className="text-sm font-semibold text-display tracking-wider uppercase mb-3">Sorteo Activo 🎉</h2>
-          {mockGiveaways.map((g) => (
-            <div key={g.id} className="flex items-center gap-3 bg-card rounded-2xl p-4 border border-border">
-              <div className="w-11 h-11 rounded-xl bg-muted flex items-center justify-center shrink-0">
-                <Gift className="w-5 h-5 text-neon-pink" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold">{g.title}</p>
-                <p className="text-xs text-muted-foreground">Finaliza: {g.endDate} · {g.entries} participantes</p>
-              </div>
-              <button
-                onClick={() => navigate("/sorteos")}
-                className="shrink-0 px-3 py-1.5 rounded-full bg-primary text-primary-foreground text-xs font-medium hover:bg-primary/90 transition-colors"
-              >
-                Participar
-              </button>
-            </div>
-          ))}
-        </section>
-      )}
-
-      {/* Activity */}
-      <section>
-        <h2 className="text-sm font-semibold text-display tracking-wider uppercase mb-3">Actividad Reciente</h2>
-        <div className="space-y-2">
-          {[
-            { text: "Ticket aprobado · +25 pts", time: "Hace 2h", icon: CheckCircle, color: "text-neon-green" },
-            { text: "Reserva confirmada: Gojo Fig.", time: "Ayer", icon: ShoppingBag, color: "text-primary" },
-            { text: "Inscripción: Torneo Pokémon", time: "Hace 3d", icon: Calendar, color: "text-neon-purple" },
-          ].map((item, i) => (
-            <div key={i} className="flex items-center gap-3 py-2">
-              <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
-                <item.icon className={`w-4 h-4 ${item.color}`} />
-              </div>
-              <div className="flex-1">
-                <p className="text-sm">{item.text}</p>
-                <p className="text-xs text-muted-foreground">{item.time}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
+      <PreviewSection title="Alertas TCG" action={() => navigate("/tcg")}>
+        <button onClick={() => navigate("/tcg")} className="app-card flex w-full items-center gap-3 rounded-xl p-3 text-left">
+          <img src={pokemonBooster} alt="" className="h-16 w-16 rounded-lg object-cover" />
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm font-black">Nuevo restock: Pokemon 151</p>
+            <p className="mt-1 text-xs text-slate-300">Hace 2 horas</p>
+          </div>
+          <Bell className="h-5 w-5 text-pink-300" />
+        </button>
+      </PreviewSection>
     </div>
   );
 };
+
+const PreviewSection = ({ title, action, children }: { title: string; action: () => void; children: React.ReactNode }) => (
+  <section>
+    <div className="mb-3 flex items-center justify-between">
+      <h2 className="text-sm font-black">{title}</h2>
+      <button onClick={action} className="flex items-center gap-1 text-xs font-bold text-cyan-300">
+        Ver todos <ChevronRight className="h-3.5 w-3.5" />
+      </button>
+    </div>
+    {children}
+  </section>
+);
 
 export default HomePage;

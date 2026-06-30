@@ -6,53 +6,53 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 230 25% 10%;
+    --background: 234 55% 5%;
+    --foreground: 220 35% 96%;
 
-    --card: 0 0% 98%;
-    --card-foreground: 230 25% 10%;
+    --card: 235 45% 9%;
+    --card-foreground: 220 35% 96%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 230 25% 10%;
+    --popover: 235 45% 9%;
+    --popover-foreground: 220 35% 96%;
 
-    --primary: 180 80% 38%;
+    --primary: 188 100% 50%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 270 50% 50%;
+    --secondary: 273 95% 58%;
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 220 14% 96%;
-    --muted-foreground: 220 10% 46%;
+    --muted: 235 30% 15%;
+    --muted-foreground: 230 18% 72%;
 
-    --accent: 30 90% 50%;
+    --accent: 43 100% 59%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
-    --ring: 180 80% 38%;
+    --border: 258 38% 31%;
+    --input: 235 28% 16%;
+    --ring: 188 100% 50%;
 
-    --radius: 0.75rem;
+    --radius: 0.9rem;
 
-    --sidebar-background: 0 0% 99%;
-    --sidebar-foreground: 230 25% 10%;
-    --sidebar-primary: 180 80% 38%;
+    --sidebar-background: 235 45% 8%;
+    --sidebar-foreground: 220 35% 96%;
+    --sidebar-primary: 188 100% 50%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 220 14% 96%;
-    --sidebar-accent-foreground: 230 25% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 180 80% 38%;
+    --sidebar-accent: 235 30% 15%;
+    --sidebar-accent-foreground: 220 35% 96%;
+    --sidebar-border: 258 38% 31%;
+    --sidebar-ring: 188 100% 50%;
 
     /* Custom tokens */
-    --neon-glow: 180 80% 38%;
-    --neon-purple: 270 50% 50%;
-    --neon-orange: 30 90% 50%;
-    --neon-pink: 330 70% 50%;
-    --neon-green: 150 60% 40%;
-    --surface-hover: 220 14% 95%;
-    --surface-active: 220 13% 91%;
+    --neon-glow: 188 100% 50%;
+    --neon-purple: 273 95% 58%;
+    --neon-orange: 43 100% 59%;
+    --neon-pink: 319 92% 58%;
+    --neon-green: 145 93% 48%;
+    --surface-hover: 236 42% 14%;
+    --surface-active: 236 40% 18%;
 
     --font-display: 'Orbitron', monospace;
     --font-body: 'Inter', sans-serif;
@@ -66,6 +66,10 @@
 
   body {
     @apply bg-background text-foreground;
+    background:
+      radial-gradient(circle at 18% 8%, hsl(var(--neon-purple) / 0.18), transparent 28rem),
+      radial-gradient(circle at 88% 20%, hsl(var(--neon-glow) / 0.12), transparent 24rem),
+      linear-gradient(180deg, #050617 0%, #09071d 55%, #060712 100%);
     font-family: var(--font-body);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -82,13 +86,13 @@
   }
 
   .glow-primary {
-    box-shadow: 0 0 8px hsl(var(--neon-glow) / 0.15),
-                0 0 20px hsl(var(--neon-glow) / 0.05);
+    box-shadow: 0 0 10px hsl(var(--neon-glow) / 0.25),
+                0 0 24px hsl(var(--neon-glow) / 0.12);
   }
 
   .glow-primary-strong {
-    box-shadow: 0 0 12px hsl(var(--neon-glow) / 0.25),
-                0 0 30px hsl(var(--neon-glow) / 0.1);
+    box-shadow: 0 0 16px hsl(var(--neon-glow) / 0.32),
+                0 0 42px hsl(var(--neon-glow) / 0.16);
   }
 
   .glow-purple {
@@ -102,7 +106,19 @@
   }
 
   .gradient-neon {
-    background: linear-gradient(135deg, hsl(var(--neon-glow)), hsl(var(--neon-purple)));
+    background: linear-gradient(135deg, hsl(var(--neon-glow)), hsl(var(--neon-purple)), hsl(var(--neon-pink)));
+  }
+
+  .app-card {
+    background:
+      linear-gradient(145deg, hsl(var(--card) / 0.96), hsl(244 44% 11% / 0.92)),
+      radial-gradient(circle at top right, hsl(var(--neon-purple) / 0.18), transparent 16rem);
+    border: 1px solid hsl(var(--border) / 0.72);
+    box-shadow: inset 0 1px 0 hsl(0 0% 100% / 0.06), 0 16px 40px hsl(240 80% 2% / 0.32);
+  }
+
+  .neon-divider {
+    border-color: hsl(var(--border) / 0.72);
   }
 
   .gradient-warm {
