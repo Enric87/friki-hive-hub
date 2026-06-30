@@ -14,6 +14,7 @@ import {
   User,
   UserRound,
 } from "lucide-react";
+import landingBackground from "@/assets/frikiquest-landing-bg.webp";
 import frikiQuestLogo from "@/assets/logo-friki-quest.webp";
 
 type AuthMode = "landing" | "login" | "signup";
@@ -24,17 +25,6 @@ const features = [
   { icon: Gift, label: "Canjea recompensas", color: "text-pink-300", glow: "shadow-pink-400/40" },
   { icon: CalendarDays, label: "Eventos y reservas", color: "text-emerald-300", glow: "shadow-emerald-400/40" },
   { icon: Bell, label: "Alertas TCG", color: "text-purple-300", glow: "shadow-purple-400/40" },
-];
-
-const backgroundIcons = [
-  { icon: "GAME", className: "left-8 top-10 -rotate-12" },
-  { icon: "D20", className: "left-8 top-[27%] rotate-12" },
-  { icon: "TCG", className: "right-8 top-[22%] -rotate-12" },
-  { icon: "XP", className: "left-12 bottom-[35%] rotate-12" },
-  { icon: "STAR", className: "right-8 bottom-[31%] -rotate-12" },
-  { icon: "+", className: "left-10 bottom-24 rotate-12" },
-  { icon: "O", className: "right-12 top-10 rotate-12" },
-  { icon: "+", className: "right-9 bottom-28 -rotate-12" },
 ];
 
 const AuthPage = () => {
@@ -83,17 +73,13 @@ const AuthPage = () => {
   if (mode === "landing") {
     return (
       <div className="relative min-h-screen overflow-hidden bg-[#07081c] text-white">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_16%,rgba(50,74,153,0.32),transparent_36%),radial-gradient(circle_at_50%_100%,rgba(143,35,207,0.55),transparent_34%),linear-gradient(180deg,#07081c_0%,#0b0b29_58%,#26084b_100%)]" />
-        <div className="absolute inset-0 opacity-25 [background-image:linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] [background-size:42px_42px]" />
-        {backgroundIcons.map((item) => (
-          <span
-            key={`${item.icon}-${item.className}`}
-            className={`absolute text-4xl font-black text-indigo-300/10 text-display ${item.className}`}
-          >
-            {item.icon}
-          </span>
-        ))}
-        <div className="absolute -bottom-24 left-1/2 h-52 w-[130%] -translate-x-1/2 rounded-[50%] bg-purple-700/55 blur-sm" />
+        <img
+          src={landingBackground}
+          alt=""
+          aria-hidden="true"
+          className="absolute inset-0 h-full w-full object-cover object-center"
+        />
+        <div className="absolute inset-0 bg-[#050617]/15" />
 
         <main className="relative z-10 mx-auto flex min-h-screen w-full max-w-md flex-col items-center justify-center px-5 py-8 text-center">
           <img
