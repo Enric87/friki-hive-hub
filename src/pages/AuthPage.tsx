@@ -11,11 +11,11 @@ import {
 } from "lucide-react";
 import landingBackground from "@/assets/frikiquest-landing-bg.webp";
 import frikiQuestLogo from "@/assets/logo-friki-quest.png";
-import alertTcgIcon from "@/assets/home-icons/alerta-tcg.png";
-import pointsIcon from "@/assets/home-icons/gana-puntos.png";
-import rewardsIcon from "@/assets/home-icons/canjea-recompensas.png";
-import ticketsIcon from "@/assets/home-icons/escanea-tickets.png";
-import eventsIcon from "@/assets/home-icons/eventos-reservas.png";
+import alertTcgIcon from "@/assets/home-icons-cropped/alerta-tcg.png";
+import pointsIcon from "@/assets/home-icons-cropped/gana-puntos.png";
+import rewardsIcon from "@/assets/home-icons-cropped/canjea-recompensas.png";
+import ticketsIcon from "@/assets/home-icons-cropped/escanea-tickets.png";
+import eventsIcon from "@/assets/home-icons-cropped/eventos-reservas.png";
 
 type AuthMode = "landing" | "login" | "signup";
 

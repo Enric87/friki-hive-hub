@@ -5,9 +5,9 @@ import { useStore } from "@/contexts/StoreContext";
 import pokemonEvent from "@/assets/eventos/torneo-pokemon.jpg";
 import gojoFigure from "@/assets/reservas/gojo-hollow-purple.jpg";
 import pokemonBooster from "@/assets/reservas/pokemon-sv8-booster.jpg";
-import rewardsIcon from "@/assets/home-icons/canjea-recompensas.png";
-import ticketsIcon from "@/assets/home-icons/escanea-tickets.png";
-import eventsIcon from "@/assets/home-icons/eventos-reservas.png";
+import rewardsIcon from "@/assets/home-icons-cropped/canjea-recompensas.png";
+import ticketsIcon from "@/assets/home-icons-cropped/escanea-tickets.png";
+import eventsIcon from "@/assets/home-icons-cropped/eventos-reservas.png";
 
 const quickActions = [
   { image: ticketsIcon, label: "Subir ticket", path: "/tickets" },
