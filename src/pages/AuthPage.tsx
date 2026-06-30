@@ -16,15 +16,20 @@ import {
 } from "lucide-react";
 import landingBackground from "@/assets/frikiquest-landing-bg.webp";
 import frikiQuestLogo from "@/assets/logo-friki-quest.png";
+import iconEscanea from "@/assets/Escanea tickets.png";
+import iconGana from "@/assets/Gana Puntos.png";
+import iconCanjea from "@/assets/Canjea recompensas.png";
+import iconEventos from "@/assets/Eventos y reservas.png";
+import iconAlerta from "@/assets/Alerta TCG.png";
 
 type AuthMode = "landing" | "login" | "signup";
 
 const features = [
-  { icon: Ticket, label: "Escanea tickets", color: "text-sky-300", glow: "shadow-sky-400/40" },
-  { icon: Coins, label: "Gana puntos", color: "text-yellow-300", glow: "shadow-yellow-300/40" },
-  { icon: Gift, label: "Canjea recompensas", color: "text-pink-300", glow: "shadow-pink-400/40" },
-  { icon: CalendarDays, label: "Eventos y reservas", color: "text-emerald-300", glow: "shadow-emerald-400/40" },
-  { icon: Bell, label: "Alertas TCG", color: "text-purple-300", glow: "shadow-purple-400/40" },
+  { img: iconEscanea, line1: "Escanea", line2: "tickets" },
+  { img: iconGana, line1: "Gana", line2: "puntos" },
+  { img: iconCanjea, line1: "Canjea", line2: "recompensas" },
+  { img: iconEventos, line1: "Eventos y", line2: "reservas" },
+  { img: iconAlerta, line1: "Alertas", line2: "TCG" },
 ];
 
 const AuthPage = () => {
@@ -100,12 +105,10 @@ const AuthPage = () => {
           </div>
 
           <div className="mt-8 grid w-full grid-cols-5 divide-x divide-white/15">
-            {features.map(({ icon: Icon, label, color, glow }) => (
-              <div key={label} className="flex min-w-0 flex-col items-center gap-2 px-1">
-                <div className={`flex h-11 w-11 items-center justify-center rounded-xl bg-white/5 shadow-lg ${glow}`}>
-                  <Icon className={`h-7 w-7 ${color}`} strokeWidth={2.5} />
-                </div>
-                <span className="text-[11px] font-semibold leading-tight text-slate-100">{label}</span>
+            {features.map(({ img, line1, line2 }) => (
+              <div key={line1} className="flex min-w-0 flex-col items-center gap-2 px-1">
+                <img src={img} alt={line1} className="h-11 w-11 object-contain" />
+                <span className="text-[11px] font-semibold leading-tight text-slate-100 text-center">{line1}<br />{line2}</span>
               </div>
             ))}
           </div>

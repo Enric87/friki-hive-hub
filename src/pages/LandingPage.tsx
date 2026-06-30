@@ -1,11 +1,17 @@
-import { Star, Gift, Gamepad2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import heroImage from "@/assets/hero-frikiquest.png";
+import iconEscanea from "@/assets/Escanea tickets.png";
+import iconGana from "@/assets/Gana Puntos.png";
+import iconCanjea from "@/assets/Canjea recompensas.png";
+import iconEventos from "@/assets/Eventos y reservas.png";
+import iconAlerta from "@/assets/Alerta TCG.png";
 
 const features = [
-  { icon: Star, text: "Gana puntos", highlight: "con tus compras" },
-  { icon: Gift, text: "Reserva figuras", highlight: "antes que nadie" },
-  { icon: Gamepad2, text: "Eventos, TCG y sorteos", highlight: "exclusivos" },
+  { img: iconEscanea, text: "Escanea tickets", highlight: "y acumula puntos" },
+  { img: iconGana, text: "Gana puntos", highlight: "con tus compras" },
+  { img: iconCanjea, text: "Canjea recompensas", highlight: "por tus puntos" },
+  { img: iconEventos, text: "Eventos y reservas", highlight: "exclusivos" },
+  { img: iconAlerta, text: "Alertas TCG", highlight: "novedades al instante" },
 ];
 
 const LandingPage = () => {
@@ -24,17 +30,15 @@ const LandingPage = () => {
       {/* Hero Image */}
       <img
         src={heroImage}
-        alt="FrikiQuest mascota con bolsa de compras llena de cartas, dados y figuras"
+        alt="FrikiQuest mascota"
         className="w-64 h-64 object-contain mx-auto mb-10"
       />
 
       {/* Features */}
       <div className="space-y-4 mb-10 w-full max-w-sm text-left">
-        {features.map(({ icon: Icon, text, highlight }) => (
+        {features.map(({ img, text, highlight }) => (
           <div key={text} className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-              <Icon className="w-5 h-5 text-primary" />
-            </div>
+            <img src={img} alt={text} className="w-12 h-12 object-contain shrink-0" />
             <p className="text-sm text-foreground">
               <span className="font-semibold">{text}</span>{" "}
               <span className="text-muted-foreground">{highlight}</span>
