@@ -1,6 +1,6 @@
 import { Receipt, ShoppingBag, Calendar, Gift, Star, Trophy, TrendingUp, CheckCircle, Award } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useProfile } from "@/hooks/useProfile";
+import { useLevels, useProfile } from "@/hooks/useProfile";
 import { useStore } from "@/contexts/StoreContext";
 
 const quickActions = [
@@ -22,12 +22,17 @@ const mockGiveaways = [
 const HomePage = () => {
   const navigate = useNavigate();
   const { data: profile } = useProfile();
+  const { data: levels } = useLevels();
   const { config } = useStore();
 
   const currentPoints = profile?.points ?? 0;
-  const currentLevel = profile?.level ?? "Novato";
-  const nextLevelPoints = currentPoints < 500 ? 500 : currentPoints < 1000 ? 1000 : currentPoints < 2000 ? 2000 : currentPoints < 5000 ? 5000 : null;
-  const progressPercent = nextLevelPoints ? (currentPoints / nextLevelPoints) * 100 : 100;
+  const currentLevelData = levels?.filter((level) => currentPoints >= level.min_points).pop();
+  const nextLevel = levels?.find((level) => level.min_points > currentPoints);
+  const currentLevel = currentLevelData?.name ?? profile?.level ?? "Novato";
+  const progressBase = currentLevelData?.min_points ?? 0;
+  const progressPercent = nextLevel
+    ? ((currentPoints - progressBase) / (nextLevel.min_points - progressBase)) * 100
+    : 100;
 
   return (
     <div className="px-4 pt-6 pb-4 max-w-lg mx-auto space-y-6 animate-fade-in">
@@ -62,12 +67,12 @@ const HomePage = () => {
         <div className="space-y-1.5">
           <div className="flex justify-between text-xs text-muted-foreground">
             <span>Progreso al siguiente nivel</span>
-            {nextLevelPoints && <span>{currentPoints}/{nextLevelPoints}</span>}
+            {nextLevel && <span>{currentPoints}/{nextLevel.min_points}</span>}
           </div>
           <div className="h-2.5 bg-muted rounded-full overflow-hidden">
             <div
               className="h-full gradient-neon rounded-full transition-all duration-500"
-              style={{ width: `${progressPercent}%` }}
+              style={{ width: `${Math.min(Math.max(progressPercent, 0), 100)}%` }}
             />
           </div>
         </div>

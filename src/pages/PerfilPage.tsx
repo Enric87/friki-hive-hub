@@ -1,4 +1,4 @@
-import { Star, Trophy, Gift, ChevronRight, LogOut, Loader2, Award, Receipt, Calendar, ShoppingBag } from "lucide-react";
+import { Star, Trophy, Gift, ChevronRight, LogOut, Loader2, Award, UserPlus } from "lucide-react";
 import { useProfile, useLevels, useAchievements } from "@/hooks/useProfile";
 import { useMyRedemptions } from "@/hooks/useRewards";
 import { useAuth } from "@/contexts/AuthContext";
@@ -139,7 +139,7 @@ const PerfilPage = () => {
                   <code className="text-sm font-bold text-neon-orange text-display">{c.coupon_code}</code>
                   <Gift className="w-4 h-4 text-neon-orange" />
                 </div>
-                <p className="text-xs text-muted-foreground">{(c as any).rewards?.name || "Recompensa"}</p>
+                <p className="text-xs text-muted-foreground">{c.rewards?.name || "Recompensa"}</p>
                 {c.expires_at && (
                   <p className="text-[10px] text-muted-foreground mt-1">
                     Válido hasta: {new Date(c.expires_at).toLocaleDateString("es-ES")}
@@ -152,6 +152,17 @@ const PerfilPage = () => {
       )}
 
       {/* History link */}
+      <button
+        onClick={() => navigate("/referidos")}
+        className="w-full flex items-center justify-between py-3 px-4 rounded-xl bg-card border border-border text-sm font-medium"
+      >
+        <span className="flex items-center gap-2">
+          <UserPlus className="w-4 h-4 text-neon-green" />
+          Invitar amigos
+        </span>
+        <ChevronRight className="w-4 h-4 text-muted-foreground" />
+      </button>
+
       <button
         onClick={() => navigate("/historial")}
         className="w-full flex items-center justify-between py-3 px-4 rounded-xl bg-card border border-border text-sm font-medium"

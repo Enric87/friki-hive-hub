@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { Gift, User, Star, Trophy, ChevronRight, Award, MapPin } from "lucide-react";
+import { Gift, User, Star, Trophy, ChevronRight, Award, MapPin, UserPlus } from "lucide-react";
 import { useProfile } from "@/hooks/useProfile";
 
 const MorePage = () => {
@@ -9,6 +9,7 @@ const MorePage = () => {
   const menuItems = [
     { icon: Award, label: "Recompensas", desc: "Canjea puntos por premios", path: "/recompensas", color: "text-primary" },
     { icon: Gift, label: "Sorteos", desc: "Participa y gana premios", path: "/sorteos", color: "text-neon-pink" },
+    { icon: UserPlus, label: "Referidos", desc: "Invita amigos y gana 50 puntos", path: "/referidos", color: "text-neon-green" },
     { icon: User, label: "Mi Perfil", desc: "Datos, niveles y logros", path: "/perfil", color: "text-foreground" },
     { icon: MapPin, label: "Contacto", desc: "Dirección, horario y WhatsApp", path: "/contacto", color: "text-neon-orange" },
   ];

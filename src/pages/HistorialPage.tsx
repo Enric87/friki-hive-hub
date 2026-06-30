@@ -1,4 +1,4 @@
-import { ArrowLeft, TrendingUp, TrendingDown, Gift, Receipt, Settings } from "lucide-react";
+import { ArrowLeft, TrendingUp, TrendingDown, Gift, Receipt, Settings, UserPlus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { usePointsLedger } from "@/hooks/usePointsLedger";
 import { useMyRedemptions } from "@/hooks/useRewards";
@@ -10,7 +10,17 @@ import StateSkeleton from "@/components/StateSkeleton";
 const typeConfig: Record<string, { label: string; icon: typeof Gift; color: string }> = {
   ticket_approved: { label: "Ticket aprobado", icon: Receipt, color: "text-neon-green" },
   reward_redeemed: { label: "Canje de recompensa", icon: Gift, color: "text-destructive" },
+  referral_qualified: { label: "Referido validado", icon: UserPlus, color: "text-neon-green" },
   manual_adjustment: { label: "Ajuste manual", icon: Settings, color: "text-primary" },
+};
+
+type TimelineEntry = {
+  id: string;
+  date: string;
+  delta: number;
+  type: string;
+  note: string | null;
+  source: "ledger" | "redemption";
 };
 
 const HistorialPage = () => {
@@ -22,8 +32,8 @@ const HistorialPage = () => {
   const isLoading = loadingLedger || loadingRedemptions;
 
   // Combine ledger + redemptions into a unified timeline
-  const timeline = [
-    ...(ledger || []).map((entry: any) => ({
+  const timeline: TimelineEntry[] = [
+    ...(ledger || []).map((entry) => ({
       id: entry.id,
       date: entry.created_at,
       delta: entry.delta,
@@ -33,7 +43,7 @@ const HistorialPage = () => {
     })),
     // If no ledger entries, show redemptions as fallback
     ...(!ledger?.length && redemptions?.length
-      ? redemptions.map((rd: any) => ({
+      ? redemptions.map((rd) => ({
           id: rd.id,
           date: rd.redeemed_at,
           delta: -(rd.rewards?.points_cost || 0),

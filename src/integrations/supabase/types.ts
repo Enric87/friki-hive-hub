@@ -112,6 +112,7 @@ export type Database = {
           id: string
           level: string
           points: number
+          referral_code: string
           updated_at: string
           user_id: string
         }
@@ -122,6 +123,7 @@ export type Database = {
           id?: string
           level?: string
           points?: number
+          referral_code?: string
           updated_at?: string
           user_id: string
         }
@@ -132,8 +134,42 @@ export type Database = {
           id?: string
           level?: string
           points?: number
+          referral_code?: string
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      referrals: {
+        Row: {
+          created_at: string
+          id: string
+          invited_user_id: string
+          inviter_user_id: string
+          qualified_at: string | null
+          referral_code: string
+          reward_points: number
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          invited_user_id: string
+          inviter_user_id: string
+          qualified_at?: string | null
+          referral_code: string
+          reward_points?: number
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          invited_user_id?: string
+          inviter_user_id?: string
+          qualified_at?: string | null
+          referral_code?: string
+          reward_points?: number
+          status?: string
         }
         Relationships: []
       }
@@ -360,6 +396,9 @@ export type Database = {
         }
         Returns: boolean
       }
+      claim_referral_code: { Args: { p_code: string }; Returns: Json }
+      ensure_my_referral_code: { Args: never; Returns: string }
+      qualify_referral: { Args: { p_referral_id: string }; Returns: Json }
       redeem_reward: { Args: { p_reward_id: string }; Returns: Json }
     }
     Enums: {

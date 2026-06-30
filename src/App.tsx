@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import { StoreProvider } from "./contexts/StoreContext";
 import ProtectedRoute from "./components/ProtectedRoute";
+import AdminProtectedRoute from "./components/AdminProtectedRoute";
 import AppLayout from "./components/AppLayout";
 import AdminLayout from "./components/AdminLayout";
 import AuthPage from "./pages/AuthPage";
@@ -21,6 +22,7 @@ import PerfilPage from "./pages/PerfilPage";
 import RecompensasPage from "./pages/RecompensasPage";
 import HistorialPage from "./pages/HistorialPage";
 import ContactoPage from "./pages/ContactoPage";
+import ReferidosPage from "./pages/ReferidosPage";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminTickets from "./pages/admin/AdminTickets";
 import AdminReservas from "./pages/admin/AdminReservas";
@@ -59,9 +61,10 @@ const App = () => (
                 <Route path="/recompensas" element={<RecompensasPage />} />
                 <Route path="/historial" element={<HistorialPage />} />
                 <Route path="/contacto" element={<ContactoPage />} />
+                <Route path="/referidos" element={<ReferidosPage />} />
               </Route>
               {/* Admin Panel */}
-              <Route element={<AdminLayout />}>
+              <Route element={<AdminProtectedRoute><AdminLayout /></AdminProtectedRoute>}>
                 <Route path="/admin" element={<AdminDashboard />} />
                 <Route path="/admin/tickets" element={<AdminTickets />} />
                 <Route path="/admin/reservas" element={<AdminReservas />} />
