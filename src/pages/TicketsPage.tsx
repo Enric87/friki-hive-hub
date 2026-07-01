@@ -11,7 +11,7 @@ type TicketFilter = "all" | "pending" | "approved" | "rejected";
 const statusConfig = {
   pending: {
     label: "Pendiente",
-    subtitle: "En revision",
+    subtitle: "En revisión",
     icon: Clock,
     text: "text-yellow-300",
     border: "border-yellow-300/35",
@@ -97,7 +97,7 @@ const TicketsPage = () => {
         }
       }, 0);
     } catch {
-      setCameraError("No se ha podido abrir la camara. Revisa permisos o sube una imagen.");
+      setCameraError("No se ha podido abrir la cámara. Revisa permisos o sube una imagen.");
       fileInputRef.current?.click();
     }
   };
@@ -193,9 +193,9 @@ const TicketsPage = () => {
             className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-cyan-400 to-violet-600 px-4 py-3 text-sm font-black text-white shadow-[0_0_28px_rgba(34,211,238,0.2)] disabled:opacity-55"
           >
             {createTicket.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
-            {createTicket.isPending ? "Enviando..." : "Confirmar envio"}
+            {createTicket.isPending ? "Enviando..." : "Confirmar envío"}
           </button>
-          {createTicket.isError && <p className="mt-3 text-center text-xs font-bold text-red-300">Error al enviar. Intentalo de nuevo.</p>}
+          {createTicket.isError && <p className="mt-3 text-center text-xs font-bold text-red-300">Error al enviar. Inténtalo de nuevo.</p>}
         </section>
       )}
 
@@ -234,7 +234,7 @@ const TicketsPage = () => {
         <section className="app-card rounded-2xl p-6">
           <StateEmpty
             icon={ImageIcon}
-            title="Aun no tienes mas tickets"
+            title="Aún no tienes más tickets"
             subtitle={filter !== "all" ? "No tienes tickets con este estado." : "Sube tu ticket y empieza a ganar puntos."}
             actionLabel="Subir mi primer ticket"
             onAction={openCamera}
