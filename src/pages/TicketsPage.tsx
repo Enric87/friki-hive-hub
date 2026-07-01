@@ -52,7 +52,11 @@ const TicketsPage = () => {
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [selectedTicket, setSelectedTicket] = useState<any | null>(null);
+  const [cameraOpen, setCameraOpen] = useState(false);
+  const [cameraError, setCameraError] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const streamRef = useRef<MediaStream | null>(null);
 
   const filtered = filter === "all" ? tickets : tickets?.filter((ticket: any) => ticket.status === filter);
 
@@ -64,6 +68,63 @@ const TicketsPage = () => {
     const reader = new FileReader();
     reader.onload = (readerEvent) => setPreviewImage(readerEvent.target?.result as string);
     reader.readAsDataURL(file);
+  };
+
+  const stopCamera = () => {
+    streamRef.current?.getTracks().forEach((track) => track.stop());
+    streamRef.current = null;
+  };
+
+  const openCamera = async () => {
+    setCameraError("");
+
+    if (!navigator.mediaDevices?.getUserMedia) {
+      fileInputRef.current?.click();
+      return;
+    }
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { ideal: "environment" } },
+        audio: false,
+      });
+      streamRef.current = stream;
+      setCameraOpen(true);
+      window.setTimeout(() => {
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+          videoRef.current.play().catch(() => undefined);
+        }
+      }, 0);
+    } catch {
+      setCameraError("No se ha podido abrir la camara. Revisa permisos o sube una imagen.");
+      fileInputRef.current?.click();
+    }
+  };
+
+  const closeCamera = () => {
+    stopCamera();
+    setCameraOpen(false);
+  };
+
+  const capturePhoto = () => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const canvas = document.createElement("canvas");
+    canvas.width = video.videoWidth || 1080;
+    canvas.height = video.videoHeight || 1440;
+    const context = canvas.getContext("2d");
+    if (!context) return;
+
+    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+    canvas.toBlob((blob) => {
+      if (!blob) return;
+      const file = new File([blob], `ticket-${Date.now()}.jpg`, { type: "image/jpeg" });
+      setSelectedFile(file);
+      setPreviewImage(canvas.toDataURL("image/jpeg", 0.92));
+      closeCamera();
+    }, "image/jpeg", 0.92);
   };
 
   const handleSubmit = async () => {
@@ -103,7 +164,7 @@ const TicketsPage = () => {
         </div>
         <div className="flex gap-2">
           <button
-            onClick={() => fileInputRef.current?.click()}
+            onClick={openCamera}
             className="flex h-11 items-center gap-2 rounded-xl border border-cyan-300/45 bg-cyan-500/10 px-3 text-xs font-black text-cyan-200 shadow-[0_0_22px_rgba(34,211,238,0.18)]"
           >
             <Camera className="h-5 w-5" />
@@ -145,6 +206,12 @@ const TicketsPage = () => {
         </div>
       )}
 
+      {cameraError && (
+        <div className="rounded-xl border border-yellow-300/25 bg-yellow-300/10 p-3 text-center text-xs font-bold text-yellow-200">
+          {cameraError}
+        </div>
+      )}
+
       <div className="flex gap-5 overflow-x-auto border-b border-white/10 scrollbar-hide">
         {filters.map((item) => (
           <button
@@ -171,7 +238,7 @@ const TicketsPage = () => {
             title="Aun no tienes mas tickets"
             subtitle={filter !== "all" ? "No tienes tickets con este estado." : "Sube tu ticket y empieza a ganar puntos."}
             actionLabel="Subir mi primer ticket"
-            onAction={() => fileInputRef.current?.click()}
+            onAction={openCamera}
           />
         </section>
       ) : (
@@ -226,6 +293,27 @@ const TicketsPage = () => {
             <DialogTitle>Detalle del ticket</DialogTitle>
           </DialogHeader>
           {selectedTicket && <TicketDetail ticket={selectedTicket} onRetry={() => fileInputRef.current?.click()} />}
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={cameraOpen} onOpenChange={(open) => (open ? setCameraOpen(true) : closeCamera())}>
+        <DialogContent className="border-cyan-300/25 bg-[#090a20] text-white">
+          <DialogHeader>
+            <DialogTitle>Foto del ticket</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="overflow-hidden rounded-2xl border border-white/10 bg-black">
+              <video ref={videoRef} playsInline muted className="max-h-[60vh] w-full object-cover" />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <button onClick={closeCamera} className="rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm font-black text-slate-200">
+                Cancelar
+              </button>
+              <button onClick={capturePhoto} className="rounded-xl bg-gradient-to-r from-cyan-400 to-violet-600 px-4 py-3 text-sm font-black text-white shadow-[0_0_28px_rgba(34,211,238,0.22)]">
+                Hacer foto
+              </button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
     </div>
