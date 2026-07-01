@@ -1,5 +1,5 @@
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
-import { Calendar, Home, MessageCircle, MoreHorizontal, Receipt, ShoppingBag } from "lucide-react";
+import { Calendar, Home, MoreHorizontal, Receipt, ShoppingBag } from "lucide-react";
 
 const tabs = [
   { path: "/home", icon: Home, label: "Inicio" },
@@ -18,14 +18,6 @@ const AppLayout = () => {
       <main className="flex-1 overflow-y-auto pb-24 scrollbar-hide">
         <Outlet />
       </main>
-
-      <button
-        onClick={() => navigate("/chatbot")}
-        className="fixed bottom-24 right-4 z-50 flex h-12 w-12 items-center justify-center rounded-full border border-cyan-300/30 gradient-neon shadow-lg transition-transform hover:scale-105 active:scale-95 glow-primary-strong"
-        aria-label="Chat de ayuda"
-      >
-        <MessageCircle className="h-5 w-5 text-primary-foreground" />
-      </button>
 
       <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-purple-300/20 bg-[#07081a]/90 shadow-[0_-18px_42px_rgba(3,5,18,0.68)] backdrop-blur-xl safe-bottom">
         <div className="mx-auto flex h-16 max-w-lg items-center justify-around px-2">

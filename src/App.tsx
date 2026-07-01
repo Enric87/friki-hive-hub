@@ -17,7 +17,6 @@ import EventosPage from "./pages/EventosPage";
 import MorePage from "./pages/MorePage";
 import SorteosPage from "./pages/SorteosPage";
 import TCGPage from "./pages/TCGPage";
-import ChatbotPage from "./pages/ChatbotPage";
 import PerfilPage from "./pages/PerfilPage";
 import RecompensasPage from "./pages/RecompensasPage";
 import HistorialPage from "./pages/HistorialPage";
@@ -28,7 +27,6 @@ import AdminTickets from "./pages/admin/AdminTickets";
 import AdminReservas from "./pages/admin/AdminReservas";
 import AdminEventos from "./pages/admin/AdminEventos";
 import AdminSorteos from "./pages/admin/AdminSorteos";
-import AdminChatbot from "./pages/admin/AdminChatbot";
 import AdminRecompensas from "./pages/admin/AdminRecompensas";
 import AdminConfigTienda from "./pages/admin/AdminConfigTienda";
 import NotFound from "./pages/NotFound";
@@ -55,7 +53,6 @@ const App = () => (
                 <Route path="/mas" element={<MorePage />} />
                 <Route path="/sorteos" element={<SorteosPage />} />
                 <Route path="/tcg" element={<TCGPage />} />
-                <Route path="/chatbot" element={<ChatbotPage />} />
                 <Route path="/perfil" element={<PerfilPage />} />
                 <Route path="/cupones" element={<PerfilPage />} />
                 <Route path="/recompensas" element={<RecompensasPage />} />
@@ -70,7 +67,6 @@ const App = () => (
                 <Route path="/admin/reservas" element={<AdminReservas />} />
                 <Route path="/admin/eventos" element={<AdminEventos />} />
                 <Route path="/admin/sorteos" element={<AdminSorteos />} />
-                <Route path="/admin/chatbot" element={<AdminChatbot />} />
                 <Route path="/admin/recompensas" element={<AdminRecompensas />} />
                 <Route path="/admin/config-tienda" element={<AdminConfigTienda />} />
               </Route>
