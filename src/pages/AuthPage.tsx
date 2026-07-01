@@ -130,8 +130,6 @@ const AuthPage = () => {
               Ya tengo cuenta
             </button>
           </div>
-
-          <p className="mt-5 text-xs font-medium text-purple-200/70">FrikiQuest para tiendas, eventos y TCG</p>
         </main>
       </div>
     );
