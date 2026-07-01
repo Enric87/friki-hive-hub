@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ShoppingBag, Clock, Truck, Package, ChevronRight, Bell, AlertTriangle } from "lucide-react";
+import { AlertTriangle, Bell, ChevronRight, Clock, ShoppingBag } from "lucide-react";
 
 import gojoImg from "@/assets/reservas/gojo-hollow-purple.jpg";
 import dragonballImg from "@/assets/reservas/dragonball-daima-boxset.jpg";
@@ -19,10 +19,10 @@ const statusConfig: Record<ReservaStatus, { label: string; color: string; bg: st
 };
 
 const mockProducts = [
-  { id: 1, name: "Gojo Satoru - Hollow Purple", category: "Figuras", status: "soon" as const, price: "189.90€", eta: "Marzo 2026", image: gojoImg, stock: 3 },
-  { id: 2, name: "Dragon Ball Daima Box Set", category: "Manga", status: "out" as const, price: "45.00€", eta: null, image: dragonballImg, stock: 0 },
-  { id: 3, name: "Pokémon SV8 Booster Box", category: "TCG", status: "soon" as const, price: "149.99€", eta: "Abril 2026", image: pokemonImg, stock: 8 },
-  { id: 4, name: "Chainsaw Man Vol. 18 Ed. Especial", category: "Manga", status: "out" as const, price: "14.95€", eta: "Feb 2026", image: chainsawImg, stock: 1 },
+  { id: 1, name: "Gojo Satoru - Hollow Purple", category: "Figuras", status: "soon" as const, price: "189,90 €", eta: "Marzo 2026", image: gojoImg, stock: 3 },
+  { id: 2, name: "Dragon Ball Daima Box Set", category: "Manga", status: "out" as const, price: "45,00 €", eta: null, image: dragonballImg, stock: 0 },
+  { id: 3, name: "Pokémon SV8 Booster Box", category: "TCG", status: "soon" as const, price: "149,99 €", eta: "Abril 2026", image: pokemonImg, stock: 8 },
+  { id: 4, name: "Chainsaw Man Vol. 18 Ed. Especial", category: "Manga", status: "out" as const, price: "14,95 €", eta: "Feb 2026", image: chainsawImg, stock: 1 },
 ];
 
 const mockReservas = [
@@ -34,71 +34,61 @@ const ReservasPage = () => {
   const [tab, setTab] = useState<"catalogo" | "misReservas">("catalogo");
 
   return (
-    <div className="px-4 pt-6 pb-4 max-w-lg mx-auto space-y-5 animate-fade-in">
+    <div className="mx-auto max-w-lg space-y-5 px-4 pb-4 pt-6 animate-fade-in">
       <h1 className="text-xl font-bold text-display">Reservas</h1>
 
-      {/* Tabs */}
-      <div className="flex bg-muted rounded-xl p-1">
+      <div className="flex rounded-xl bg-muted p-1">
         {[
           { key: "catalogo" as const, label: "Próximamente" },
-          { key: "misReservas" as const, label: "Mis Reservas" },
-        ].map((t) => (
+          { key: "misReservas" as const, label: "Mis reservas" },
+        ].map((item) => (
           <button
-            key={t.key}
-            onClick={() => setTab(t.key)}
-            className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all ${
-              tab === t.key ? "bg-card text-foreground glow-primary" : "text-muted-foreground"
+            key={item.key}
+            onClick={() => setTab(item.key)}
+            className={`flex-1 rounded-lg py-2 text-sm font-medium transition-all ${
+              tab === item.key ? "bg-card text-foreground glow-primary" : "text-muted-foreground"
             }`}
           >
-            {t.label}
+            {item.label}
           </button>
         ))}
       </div>
 
       {tab === "catalogo" ? (
         <div className="space-y-3">
-          {mockProducts.map((p) => (
-            <div key={p.id} className="bg-card rounded-2xl p-4 border border-border flex gap-4">
-              <img
-                src={p.image}
-                alt={p.name}
-                className="w-20 h-20 rounded-xl object-cover shrink-0 bg-muted"
-              />
-              <div className="flex-1 min-w-0 flex flex-col justify-between">
+          {mockProducts.map((product) => (
+            <div key={product.id} className="flex gap-4 rounded-2xl border border-border bg-card p-4">
+              <img src={product.image} alt={product.name} className="h-20 w-20 shrink-0 rounded-xl bg-muted object-cover" />
+              <div className="flex min-w-0 flex-1 flex-col justify-between">
                 <div>
                   <div className="flex items-start justify-between gap-2">
-                    <p className="text-sm font-semibold truncate">{p.name}</p>
-                    <span className={`text-[10px] px-2 py-0.5 rounded-full shrink-0 ${
-                      p.status === "soon" ? "bg-neon-orange/10 text-neon-orange" : "bg-muted text-muted-foreground"
+                    <p className="truncate text-sm font-semibold">{product.name}</p>
+                    <span className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] ${
+                      product.status === "soon" ? "bg-neon-orange/10 text-neon-orange" : "bg-muted text-muted-foreground"
                     }`}>
-                      {p.status === "soon" ? "Próximamente" : "Sin stock"}
+                      {product.status === "soon" ? "Próximamente" : "Sin stock"}
                     </span>
                   </div>
-                  <p className="text-xs text-muted-foreground">{p.category} · {p.price}</p>
-                  {p.eta && <p className="text-xs text-neon-orange mt-0.5">📅 ETA: {p.eta}</p>}
-                  
-                  {/* Stock urgency indicator */}
-                  {p.stock > 0 && p.stock <= 5 && (
-                    <div className="flex items-center gap-1 mt-1">
-                      <AlertTriangle className="w-3 h-3 text-destructive" />
-                      <span className="text-[10px] font-semibold text-destructive">
-                        ¡Solo quedan {p.stock} unidades!
-                      </span>
+                  <p className="text-xs text-muted-foreground">{product.category} · {product.price}</p>
+                  {product.eta && <p className="mt-0.5 text-xs text-neon-orange">ETA: {product.eta}</p>}
+
+                  {product.stock > 0 && product.stock <= 5 && (
+                    <div className="mt-1 flex items-center gap-1">
+                      <AlertTriangle className="h-3 w-3 text-destructive" />
+                      <span className="text-[10px] font-semibold text-destructive">¡Solo quedan {product.stock} unidades!</span>
                     </div>
                   )}
-                  {p.stock === 0 && (
-                    <p className="text-[10px] text-muted-foreground mt-1">Sin unidades disponibles</p>
-                  )}
+                  {product.stock === 0 && <p className="mt-1 text-[10px] text-muted-foreground">Sin unidades disponibles</p>}
                 </div>
-                <button 
-                  disabled={p.stock === 0}
-                  className={`mt-2 w-full py-1.5 rounded-lg text-xs font-medium border transition-colors ${
-                    p.stock > 0
-                      ? "bg-primary/10 text-primary border-primary/20 hover:bg-primary/20"
-                      : "bg-muted text-muted-foreground border-border cursor-not-allowed"
+                <button
+                  disabled={product.stock === 0}
+                  className={`mt-2 w-full rounded-lg border py-1.5 text-xs font-medium transition-colors ${
+                    product.stock > 0
+                      ? "border-primary/20 bg-primary/10 text-primary hover:bg-primary/20"
+                      : "cursor-not-allowed border-border bg-muted text-muted-foreground"
                   }`}
                 >
-                  {p.stock > 0 ? "Reservar" : "Sin stock"}
+                  {product.stock > 0 ? "Reservar" : "Sin stock"}
                 </button>
               </div>
             </div>
@@ -107,38 +97,29 @@ const ReservasPage = () => {
       ) : (
         <div className="space-y-3">
           {mockReservas.length === 0 ? (
-            <div className="text-center py-12 text-muted-foreground">
-              <ShoppingBag className="w-10 h-10 mx-auto mb-2 opacity-40" />
+            <div className="py-12 text-center text-muted-foreground">
+              <ShoppingBag className="mx-auto mb-2 h-10 w-10 opacity-40" />
               <p className="text-sm">No tienes reservas activas</p>
-              <p className="text-xs mt-1">¡Reserva antes de que se agoten! 🔥</p>
+              <p className="mt-1 text-xs">¡Reserva antes de que se agoten!</p>
             </div>
           ) : (
-            mockReservas.map((r) => {
-              const cfg = statusConfig[r.status];
+            mockReservas.map((reserva) => {
+              const cfg = statusConfig[reserva.status];
               return (
-                <div key={r.id} className="bg-card rounded-2xl p-4 border border-border">
+                <div key={reserva.id} className="rounded-2xl border border-border bg-card p-4">
                   <div className="flex items-center gap-3">
-                    <img
-                      src={r.image}
-                      alt={r.productName}
-                      className="w-12 h-12 rounded-lg object-cover shrink-0 bg-muted"
-                    />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium truncate">{r.productName}</p>
+                    <img src={reserva.image} alt={reserva.productName} className="h-12 w-12 shrink-0 rounded-lg bg-muted object-cover" />
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-medium">{reserva.productName}</p>
                       <p className={`text-xs ${cfg.color}`}>{cfg.label}</p>
                     </div>
-                    {r.status === "lista" && (
-                      <Bell className="w-4 h-4 text-neon-green animate-pulse-glow" />
-                    )}
-                    <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                    {reserva.status === "lista" && <Bell className="h-4 w-4 text-neon-green animate-pulse-glow" />}
+                    <ChevronRight className="h-4 w-4 text-muted-foreground" />
                   </div>
-                  {/* Expiration warning */}
-                  {r.expiresIn && (
-                    <div className="mt-2 flex items-center gap-1.5 bg-neon-orange/10 rounded-lg px-3 py-1.5">
-                      <Clock className="w-3 h-3 text-neon-orange" />
-                      <span className="text-[10px] font-medium text-neon-orange">
-                        Reserva expira en {r.expiresIn}
-                      </span>
+                  {reserva.expiresIn && (
+                    <div className="mt-2 flex items-center gap-1.5 rounded-lg bg-neon-orange/10 px-3 py-1.5">
+                      <Clock className="h-3 w-3 text-neon-orange" />
+                      <span className="text-[10px] font-medium text-neon-orange">Reserva expira en {reserva.expiresIn}</span>
                     </div>
                   )}
                 </div>

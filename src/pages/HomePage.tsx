@@ -80,7 +80,7 @@ const HomePage = () => {
       </section>
 
       <section>
-        <h2 className="mb-3 text-sm font-black">Acciones rapidas</h2>
+        <h2 className="mb-3 text-sm font-black">Acciones rápidas</h2>
         <div className="grid grid-cols-3 gap-3">
           {quickActions.map(({ image, label, path }) => (
             <button
@@ -95,12 +95,12 @@ const HomePage = () => {
         </div>
       </section>
 
-      <PreviewSection title="Proximo evento" action={() => navigate("/eventos")}>
+      <PreviewSection title="Próximo evento" action={() => navigate("/eventos")}>
         <button onClick={() => navigate("/eventos")} className="app-card flex w-full items-center gap-3 rounded-xl p-3 text-left">
           <img src={pokemonEvent} alt="" className="h-16 w-16 rounded-lg object-cover" />
           <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-black">Torneo Pokemon</p>
-            <p className="mt-1 text-xs text-slate-300">Sabado, 15 feb · 17:00</p>
+            <p className="truncate text-sm font-black">Torneo Pokémon</p>
+            <p className="mt-1 text-xs text-slate-300">Sábado, 15 feb · 17:00</p>
             <p className="mt-1 text-xs font-bold text-emerald-300">Quedan 8 plazas</p>
           </div>
           <ChevronRight className="h-5 w-5 text-cyan-300" />
@@ -113,7 +113,7 @@ const HomePage = () => {
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-black">Figura Gojo SSJ</p>
             <p className="mt-1 text-xs text-slate-300">Reservada · Recogida en tienda</p>
-            <p className="mt-1 text-xs font-bold text-emerald-300">Fecha limite: 20 feb</p>
+            <p className="mt-1 text-xs font-bold text-emerald-300">Fecha límite: 20 feb</p>
           </div>
           <ShoppingBag className="h-5 w-5 text-violet-300" />
         </button>
@@ -123,7 +123,7 @@ const HomePage = () => {
         <button onClick={() => navigate("/tcg")} className="app-card flex w-full items-center gap-3 rounded-xl p-3 text-left">
           <img src={pokemonBooster} alt="" className="h-16 w-16 rounded-lg object-cover" />
           <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-black">Nuevo restock: Pokemon 151</p>
+            <p className="truncate text-sm font-black">Nuevo restock: Pokémon 151</p>
             <p className="mt-1 text-xs text-slate-300">Hace 2 horas</p>
           </div>
           <Bell className="h-5 w-5 text-pink-300" />

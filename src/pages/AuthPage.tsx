@@ -95,7 +95,7 @@ const AuthPage = () => {
               Tus <span className="text-fuchsia-300 drop-shadow-[0_0_16px_rgba(217,70,239,0.7)]">recompensas.</span>
             </h1>
             <p className="mx-auto max-w-sm text-base font-medium leading-relaxed text-slate-300">
-              Escanea, acumula puntos, consigue recompensas y disfruta de experiencias unicas.
+              Escanea, acumula puntos, consigue recompensas y disfruta de experiencias únicas.
             </p>
           </div>
 
@@ -144,10 +144,10 @@ const AuthPage = () => {
       </button>
 
       <h1 className="text-2xl font-bold text-display mb-1">
-        {mode === "login" ? "Iniciar sesion" : "Crear cuenta"}
+        {mode === "login" ? "Iniciar sesión" : "Crear cuenta"}
       </h1>
       <p className="text-sm text-muted-foreground mb-8">
-        {mode === "login" ? "Accede a tu cuenta FrikiQuest" : "Unete a la comunidad FrikiQuest"}
+        {mode === "login" ? "Accede a tu cuenta FrikiQuest" : "Únete a la comunidad FrikiQuest"}
       </p>
 
       {error && (
@@ -191,7 +191,7 @@ const AuthPage = () => {
             <Lock className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
             <input
               type="password"
-              placeholder="Contrasena"
+                placeholder="Contraseña"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
@@ -210,12 +210,12 @@ const AuthPage = () => {
       )}
 
       <p className="text-sm text-muted-foreground mt-6">
-        {mode === "login" ? "No tienes cuenta? " : "Ya tienes cuenta? "}
+        {mode === "login" ? "¿No tienes cuenta? " : "¿Ya tienes cuenta? "}
         <button
           onClick={() => { setMode(mode === "login" ? "signup" : "login"); setError(""); setSuccess(""); }}
           className="text-primary font-semibold hover:underline"
         >
-          {mode === "login" ? "Crear cuenta" : "Iniciar sesion"}
+          {mode === "login" ? "Crear cuenta" : "Iniciar sesión"}
         </button>
       </p>
     </div>
