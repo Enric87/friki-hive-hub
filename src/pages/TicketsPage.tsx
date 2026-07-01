@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { Camera, CheckCircle, ChevronRight, Clock, FileImage, ImageIcon, Loader2, QrCode, ReceiptText, X, XCircle } from "lucide-react";
+import { Camera, CheckCircle, ChevronRight, Clock, FileImage, ImageIcon, Loader2, ReceiptText, X, XCircle } from "lucide-react";
 import { useCreateTicket, useTickets } from "@/hooks/useTickets";
 import StateEmpty from "@/components/StateEmpty";
 import StateError from "@/components/StateError";
@@ -152,7 +152,6 @@ const TicketsPage = () => {
         ref={fileInputRef}
         type="file"
         accept="image/*"
-        capture="environment"
         className="hidden"
         onChange={handleFileSelect}
       />
@@ -174,8 +173,8 @@ const TicketsPage = () => {
             onClick={() => fileInputRef.current?.click()}
             className="flex h-11 items-center gap-2 rounded-xl border border-sky-400/35 bg-blue-600/10 px-3 text-xs font-black text-sky-200 shadow-[0_0_22px_rgba(59,130,246,0.16)]"
           >
-            <QrCode className="h-5 w-5" />
-            QR
+            <FileImage className="h-5 w-5" />
+            Archivo
           </button>
         </div>
       </header>
