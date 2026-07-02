@@ -6,7 +6,7 @@ const tabs = [
   { path: "/tickets", icon: Receipt, label: "Tickets" },
   { path: "/reservas", icon: ShoppingBag, label: "Reservas" },
   { path: "/eventos", icon: Calendar, label: "Eventos" },
-  { path: "/mas", icon: MoreHorizontal, label: "Mas" },
+  { path: "/mas", icon: MoreHorizontal, label: "Más" },
 ];
 
 const AppLayout = () => {
