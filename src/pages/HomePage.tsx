@@ -1,10 +1,11 @@
-import { Bell, Calendar, ChevronRight, ShoppingBag, Star } from "lucide-react";
+import { Bell, ChevronRight, ShoppingBag, Star } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useLevels, useProfile } from "@/hooks/useProfile";
 import { useStore } from "@/contexts/StoreContext";
 import pokemonEvent from "@/assets/eventos/torneo-pokemon.jpg";
 import gojoFigure from "@/assets/reservas/gojo-hollow-purple.jpg";
 import pokemonBooster from "@/assets/reservas/pokemon-sv8-booster.jpg";
+import pointsIcon from "@/assets/home-icons-cropped/gana-puntos.png";
 import rewardsIcon from "@/assets/home-icons-cropped/canjea-recompensas.png";
 import ticketsIcon from "@/assets/home-icons-cropped/escanea-tickets.png";
 import eventsIcon from "@/assets/home-icons-cropped/eventos-reservas.png";
@@ -53,16 +54,14 @@ const HomePage = () => {
 
       <section className="app-card overflow-hidden rounded-2xl p-5">
         <div className="flex items-start justify-between gap-4">
-          <div>
+          <div className="min-w-0">
             <p className="text-[11px] font-black uppercase tracking-wide text-yellow-100">Puntos disponibles</p>
             <div className="mt-2 flex items-end gap-2">
               <span className="text-5xl font-black leading-none text-yellow-300 text-display">{currentPoints}</span>
               <span className="pb-1 text-xl font-black text-yellow-200">pts</span>
             </div>
           </div>
-          <div className="flex h-20 w-20 items-center justify-center rounded-full border border-yellow-200/60 bg-yellow-300/10 shadow-[0_0_30px_rgba(250,204,21,0.45)]">
-            <Star className="h-10 w-10 fill-yellow-300 text-yellow-300" />
-          </div>
+          <img src={pointsIcon} alt="" aria-hidden="true" className="h-24 w-24 shrink-0 object-contain" />
         </div>
 
         <div className="mt-5 space-y-2">
