@@ -1,9 +1,8 @@
 import { BadgeCheck, Bell, CalendarClock, ChevronRight, ShoppingBag } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useLevels, useProfile } from "@/hooks/useProfile";
-import { useStore } from "@/contexts/StoreContext";
 import pokemonEvent from "@/assets/eventos/torneo-pokemon.jpg";
-import frikiQuestLogo from "@/assets/logo-friki-quest.png";
+import profileAvatar from "@/assets/profile-avatar-goku.jpg";
 import gojoFigure from "@/assets/reservas/gojo-hollow-purple.jpg";
 import pokemonBooster from "@/assets/reservas/pokemon-sv8-booster.jpg";
 import pointsIcon from "@/assets/home-icons-cropped/gana-puntos.png";
@@ -21,7 +20,6 @@ const HomePage = () => {
   const navigate = useNavigate();
   const { data: profile } = useProfile();
   const { data: levels } = useLevels();
-  const { config } = useStore();
 
   const currentPoints = profile?.points ?? 0;
   const currentLevelData = levels?.filter((level) => currentPoints >= level.min_points).pop();
@@ -53,7 +51,7 @@ const HomePage = () => {
         <header className="flex items-center justify-between">
           <button onClick={() => navigate("/perfil")} className="flex min-w-0 items-center gap-3 text-left">
             <div className="h-16 w-16 shrink-0 overflow-hidden rounded-full border-2 border-violet-400/70 bg-white shadow-[0_0_26px_rgba(168,85,247,0.42)]">
-              <img src={frikiQuestLogo} alt="" aria-hidden="true" className="h-full w-full scale-[1.58] object-contain object-top" />
+              <img src={profileAvatar} alt="" aria-hidden="true" className="h-full w-full object-cover" />
             </div>
             <div className="min-w-0">
               <p className="truncate text-3xl font-black tracking-tight">¡Hola, {userName}!</p>
